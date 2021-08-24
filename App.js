@@ -46,7 +46,7 @@ const Section = ({children, title}): Node => {
             color: isDarkMode ? Colors.light : Colors.dark,
           },
         ]}>
-        {children}
+        {"WJ " + SCREEN_W}
       </Text>
     </View>
   );
