@@ -126,11 +126,13 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.expensesrecord"
+        applicationId APP_ID
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        resValue "string","app_label_name", APP_LABEL_NAME
+        resValue "string","app_name", APP_NAME
     }
     splits {
         abi {
@@ -147,6 +149,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('KEYSTORE_FILE_NAME')) {
+                storeFile file(KEYSTORE_FILE_NAME)
+                storePassword KEYSTORE_PASSWORD
+                keyAlias KEYSTORE_ALIAS_NAME
+                keyPassword KEYSTORE_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
@@ -155,7 +165,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -163,17 +173,15 @@ android {
 
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // https://developer.android.com/studio/build/configure-apk-splits.html
-            // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        defaultConfig.versionCode * 1000 + versionCodes.get(abi)
+        variant.outputs.all {
+            def fileName = ""
+            def apkName = APK_FILE_NAME + ""
+            if (apkName != null && !apkName.isEmpty()) {
+                fileName = "${apkName}.apk"
+            } else {
+                fileName = "${variant.productFlavors[0].name}.apk"
             }
-
+            outputFileName = "${fileName}"
         }
     }
 }
