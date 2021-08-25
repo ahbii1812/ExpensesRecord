@@ -16,6 +16,8 @@ target 'ExpensesRecord' do
     inherit! :complete
     # Pods for testing
   end
+  
+  pod 'Firebase/Analytics'
 
   # Enables Flipper.
   #

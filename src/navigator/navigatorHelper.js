@@ -17,7 +17,7 @@ import Home from '../screen/Home';
 import custom from '../theme/customization';
 
 function HomePage({ navigation }) {
-    return <Stack.Navigator initialRouteName="Splash"
+    return <Stack.Navigator initialRouteName="Home"
         screenOptions={{ headerShown: false, style: { backgroundColor: "red" } }}>
         <Stack.Screen name="Home" >
             {props => <Home props={props} />}

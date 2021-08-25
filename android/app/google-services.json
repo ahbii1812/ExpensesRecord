@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "306058600327",
+    "project_id": "expenses-note-2cba6",
+    "storage_bucket": "expenses-note-2cba6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306058600327:android:6f705a5d54caea329a3d22",
+        "android_client_info": {
+          "package_name": "com.bii.exprecord"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306058600327-t3h3e0opjpp2mlurt011m0aspm9pdksa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQo18haGbgL-sTXZYVm-CjVuD2pLhQrW8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306058600327-t3h3e0opjpp2mlurt011m0aspm9pdksa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
