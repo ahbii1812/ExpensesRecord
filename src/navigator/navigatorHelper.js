@@ -12,18 +12,18 @@ import React from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
 import 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Screen2 from '../screen/screen2'
+import AddCard from '../screen/AddCard'
 import Home from '../screen/Home';
 import custom from '../theme/customization';
 
 function HomePage({ navigation }) {
     return <Stack.Navigator initialRouteName="Home"
-        screenOptions={{ headerShown: false, style: { backgroundColor: "red" } }}>
+        screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" >
             {props => <Home props={props} />}
         </Stack.Screen>
-        <Stack.Screen name="Screen2" >
-            {props => <Screen2 props={props} />}
+        <Stack.Screen name="Add Card" >
+            {props => <AddCard props={props} />}
         </Stack.Screen>
     </Stack.Navigator>
 
@@ -33,10 +33,10 @@ const Stack = createStackNavigator();
 
 function App({ navigation }) {
     return (
-        <NavigationContainer style={{ backgroundColor: custom.mainColor }}>
+        <NavigationContainer style={{ backgroundColor: custom.mainBgColor }}>
             <StatusBar translucent backgroundColor="transparent"></StatusBar>
-            <SafeAreaView style={{ backgroundColor: custom.mainColor, flex: 0 }} />
-            <SafeAreaView style={{ backgroundColor: custom.mainColor, flex: 1 }}>
+            <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 0 }} />
+            <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 1 }}>
                 <HomePage />
             </SafeAreaView>
         </NavigationContainer>

@@ -19,8 +19,8 @@ class firebaseAPI extends Component {
         }
     }
 
-    firebaseGetRealTimeData = async => {
-        const AllUsers = firestore().collection('users');
+    firebaseGetRealTimeData = async() => {
+        const AllUsers = await firestore().collection('users');
 
         const observer = AllUsers.onSnapshot(docSnapshot => {
             docSnapshot.forEach(doc => {
