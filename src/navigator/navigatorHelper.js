@@ -17,15 +17,16 @@ import Home from '../screen/Home';
 import custom from '../theme/customization';
 
 function HomePage({ navigation }) {
-    return <Stack.Navigator initialRouteName="Home"
-        screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" >
-            {props => <Home props={props} />}
-        </Stack.Screen>
-        <Stack.Screen name="Add Card" >
-            {props => <AddCard props={props} />}
-        </Stack.Screen>
-    </Stack.Navigator>
+    return (
+        <Stack.Navigator initialRouteName="Home"
+            screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Home" >
+                {props => <Home props={props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Add Card" >
+                {props => <AddCard props={props} />}
+            </Stack.Screen>
+        </Stack.Navigator>)
 
 }
 

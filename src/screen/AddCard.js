@@ -1,5 +1,5 @@
 import React, { Component, useState } from "react"
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import custom from "../theme/customization";
 import TopNavBar from '../component/topNavBar'
 import { Picker } from "@react-native-picker/picker";
@@ -9,22 +9,137 @@ export default class AddCard extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: [
-                { label: "Public Bank", value: "Public Bank" },
-                { label: "Maybank", value: "Maybank" },
+            bankList: [
+                { label: "Aeon Wallet", value: "Aeon Wallet" },
+                { label: "Affin Bank", value: "Affin Bank" },
+                { label: "Agro Bank", value: "Agro Bank" },
+                { label: "AmBank", value: "AmBank" },
+                { label: "Boost", value: "Boost" },
+                { label: "CIMB Bank", value: "CIMB Bank" },
+                { label: "Exim Bank", value: "Exim Bank" },
+                { label: "GrabPay", value: "GrabPay" },
+                { label: "HSBC Bank", value: "HSBC Bank" },
                 { label: "Hong Leong Bank", value: "Hong Leong Bank" },
-                { label: "CIMB Bank", value: "CIMB Bank" }],
+                { label: "Maybank", value: "Maybank" },
+                { label: "MAE Wallet", value: "MAE Wallet" },
+                { label: "OCBC Bank", value: "OCBC Bank" },
+                { label: "Public Bank", value: "Public Bank" },
+                { label: "RHB Bank", value: "RHB Bank" },
+                { label: "Standard Chartered Bank", value: "Standard Chartered Bank" },
+                { label: "Shopee Pay", value: "Shopee Pay" },
+                { label: "Touch n Go", value: "Touch n Go" },
+                { label: "UOB Bank", value: "UOB Bank" },
+                { label: "Others", value: "Others" },
+            ],
             selectedBank: "",
+            tempSelectedBank: "",
             isShowPicker: false,
+            cardTypeList: [
+                { label: "Credit Card", value: "Credit Card" },
+                { label: "Debit Card / Saving Account", value: "Debit Card / Saving Account" },
+                { label: "E-Wallet", value: "E-Wallet" }],
+            tempSelectCardType: "",
+            selectedCardType: "",
+            isShowCardTypePicker: false,
+            amount: "",
+            creditLimit: "",
         }
 
     }
 
     componentDidMount() {
+        this.setState({ tempSelectedBank: this.state.bankList[0].value })
+        this.setState({ tempSelectCardType: this.state.cardTypeList[0].value })
+    }
 
+    render() {
+        return <View style={{ height: "100%", width: "100%", backgroundColor: custom.mainBgColor, alignItems: "center" }}>
+            <TopNavBar props={this.props.props.navigation} title={"Add Card"} backButton />
+            <View style={{ width: "100%", marginTop: 35, backgroundColor: custom.minorBgColor }}>
+                <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Bank Or Wallet :</Text>
+                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowPicker: true }); Keyboard.dismiss() }} >
+                        {this.state.selectedBank ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedBank}</Text>
+                            :
+                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Bank...</Text>}
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Card Type :</Text>
+                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowCardTypePicker: true }); Keyboard.dismiss() }} >
+                        {this.state.selectedCardType ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardType}</Text>
+                            :
+                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Card Type...</Text>}
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Balance :</Text>
+                    <View style={{ width: "60%", flexDirection: "row" }}>
+                        <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
+                        <TextInput
+                            maxLength={10}
+                            keyboardType="numeric"
+                            onChangeText={(text) => { this.onChangeAmount(text) }}
+                            style={[styles.textInputStyle, { width: "85%" }]}
+                            placeholder={"0.00"}
+                            value={this.state.amount}
+                            placeholderTextColor={custom.placeholderTextColor}
+                            returnKeyType='done' />
+                    </View>
+                </View>
+                {this.state.selectedCardType == "Credit Card" && <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Credit Limit :</Text>
+                    <View style={{ width: "60%", flexDirection: "row" }}>
+                        <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
+                        <TextInput
+                            maxLength={10}
+                            keyboardType="numeric"
+                            onChangeText={(text) => { this.onChangeAmount(text) }}
+                            style={[styles.textInputStyle, { width: "85%" }]}
+                            placeholder={"0.00"}
+                            value={this.state.amount}
+                            placeholderTextColor={custom.placeholderTextColor}
+                            returnKeyType='done' />
+                    </View>
+                </View>}
+                <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Remarks :</Text>
+                    <TextInput style={styles.textInputStyle}></TextInput>
+                </View>
+                <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
+            </View>
+            <TouchableOpacity style={styles.addButtonStyle} >
+                <Text style={{ color: custom.mainFontColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>Add</Text>
+            </TouchableOpacity>
+            {this.state.isShowPicker && this.renderPicker()}
+            {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
+        </View>
+    }
+
+    onChangeAmount(text) {
+        let str = text.toString();
+        if (str.includes(".")) {
+            let arr = str.split(".");
+            if (arr?.[1]?.length < 3) {
+                this.setState({ amount: text })
+            }
+        } else { this.setState({ amount: text }) }
+    }
+
+    onCreditLimit(text) {
+        let str = text.toString();
+        if (str.includes(".")) {
+            let arr = str.split(".");
+            if (arr?.[1]?.length < 3) {
+                this.setState({ creditLimit: text })
+            }
+        } else { this.setState({ creditLimit: text }) }
     }
 
     renderPicker() {
+        const onConfirm = () => {
+            this.setState({ selectedBank: this.state.tempSelectedBank, isShowPicker: false })
+        }
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
@@ -36,51 +151,52 @@ export default class AddCard extends Component {
                 <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
                 </TouchableOpacity>
             </View>
             <Picker
                 style={{ backgroundColor: "#808080", height: "30%" }}
-                selectedValue={this.state.selectedBank}
+                selectedValue={this.state.tempSelectedBank}
                 onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ selectedBank: itemValue })}
+                    this.setState({ tempSelectedBank: itemValue })}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
-                {this.state.data.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
+                {this.state.bankList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
             </Picker>
         </View >
     }
 
+    renderCardTypePicker() {
 
-    render() {
-        return <View style={{ height: "100%", width: "100%", backgroundColor: custom.mainBgColor }}>
-            <TopNavBar props={this.props.props.navigation} title={"Add Card"} backButton />
-            <View style={{ width: "100%", marginTop: 35, backgroundColor: custom.minorBgColor }}>
-                <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Account Bank :</Text>
-                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowPicker: true }) }} >
-                        {this.state.selectedBank ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedBank}</Text>
-                            :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Bank...</Text>}
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Balance :</Text>
-                    <TextInput style={styles.textInputStyle}></TextInput>
-                </View>
-                <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Credit Limit :</Text>
-                    <TextInput style={styles.textInputStyle}></TextInput>
-                </View>
-                <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Remarks :</Text>
-                    <TextInput style={styles.textInputStyle}></TextInput>
-                </View>
-                <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
+        const onConfirm = () => {
+            this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
+        }
+        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
+            <TouchableWithoutFeedback onPress={() => { this.setState({ isShowCardTypePicker: false }) }}>
+                <View style={{ width: "100%", height: "70%" }} />
+            </TouchableWithoutFeedback>
+            <View style={{ height: 44, width: "100%", backgroundColor: "#696969", flexDirection: "row" }}>
+                <TouchableOpacity onPress={() => { this.setState({ isShowCardTypePicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
+                </TouchableOpacity>
             </View>
-            {this.state.isShowPicker && this.renderPicker()}
-        </View>
+            <Picker
+                style={{ backgroundColor: "#808080", height: "30%" }}
+                selectedValue={this.state.tempSelectCardType}
+                onValueChange={(itemValue, itemIndex) =>
+                    this.setState({ tempSelectCardType: itemValue })}
+                itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
+            >
+                {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
+            </Picker>
+        </View >
     }
 }
 
@@ -106,5 +222,15 @@ const styles = StyleSheet.create({
         fontSize: custom.titleFontSize,
         color: custom.mainFontColor,
         width: "35%"
+    },
+    addButtonStyle: {
+        marginTop: 50,
+        backgroundColor:
+            custom.minorBgColor,
+        width: "90%",
+        borderRadius: 15,
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center"
     }
 })
