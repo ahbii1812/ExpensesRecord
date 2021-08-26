@@ -5,6 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import dataStore from '../storageHelper/dataStore';
 import custom from '../theme/customization';
+import FlipCard from 'react-native-flip-card'
 
 export default function Home(props) {
     const navigator = props.props.navigation
@@ -14,18 +15,30 @@ export default function Home(props) {
         setData(dataStore.allCard)
     })
 
-
-
-
     const RenderCard = () => {
         return !_.isEmpty(data) ? <Carousel
             data={data}
-            layout='default'
-            loop={true}
+            layout='stack'
+            loop={false}
             renderItem={({ item, index }) => {
-                return <View style={styles.carouselItem}>
-                    <Text>{item.bank}</Text>
-                </View>
+                return <FlipCard
+                    friction={6}
+                    perspective={1000}
+                    flipHorizontal={true}
+                    flipVertical={false}
+                    flip={false}
+                    clickable={true}
+                    onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd) }}
+                >
+                    {/* Face Side */}
+                    <View style={styles.carouselItem}>
+                        <Text>{item.bank}</Text>
+                    </View>
+                    {/* Back Side */}
+                    <View style={styles.carouselItem}>
+                        <Text>"Back"</Text>
+                    </View>
+                </FlipCard>
             }}
             sliderWidth={SCREEN_W}
             itemWidth={350} /> :
@@ -65,6 +78,7 @@ const styles = StyleSheet.create({
         tintColor: custom.imageTintColor
     },
     carouselItem: {
+        marginTop: 20,
         backgroundColor: "red",
         width: 350,
         height: 200,
