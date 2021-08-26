@@ -15,11 +15,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AddCard from '../screen/AddCard'
 import Home from '../screen/Home';
 import custom from '../theme/customization';
+import SplashScreen from '../screen/Splash'
 
 function HomePage({ navigation }) {
     return (
-        <Stack.Navigator initialRouteName="Home"
+        <Stack.Navigator initialRouteName="Splash"
             screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Splash" >
+                {props => <SplashScreen props={props} />}
+            </Stack.Screen>
             <Stack.Screen name="Home" >
                 {props => <Home props={props} />}
             </Stack.Screen>

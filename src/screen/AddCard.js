@@ -1,8 +1,10 @@
-import React, { Component, useState } from "react"
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import custom from "../theme/customization";
-import TopNavBar from '../component/topNavBar'
 import { Picker } from "@react-native-picker/picker";
+import React, { Component } from "react";
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import TopNavBar from '../component/topNavBar';
+import dataStore from "../storageHelper/dataStore";
+import FireBaseAPI from "../storageHelper/firebaseAPI";
+import custom from "../theme/customization";
 
 export default class AddCard extends Component {
 
@@ -13,6 +15,7 @@ export default class AddCard extends Component {
                 { label: "Aeon Wallet", value: "Aeon Wallet" },
                 { label: "Affin Bank", value: "Affin Bank" },
                 { label: "Agro Bank", value: "Agro Bank" },
+                { label: "Alipay", value: "Alipay" },
                 { label: "AmBank", value: "AmBank" },
                 { label: "Boost", value: "Boost" },
                 { label: "CIMB Bank", value: "CIMB Bank" },
@@ -23,6 +26,7 @@ export default class AddCard extends Component {
                 { label: "Maybank", value: "Maybank" },
                 { label: "MAE Wallet", value: "MAE Wallet" },
                 { label: "OCBC Bank", value: "OCBC Bank" },
+                { label: "Paypal", value: "Paypal" },
                 { label: "Public Bank", value: "Public Bank" },
                 { label: "RHB Bank", value: "RHB Bank" },
                 { label: "Standard Chartered Bank", value: "Standard Chartered Bank" },
@@ -43,6 +47,7 @@ export default class AddCard extends Component {
             isShowCardTypePicker: false,
             amount: "",
             creditLimit: "",
+            remarks: ""
         }
 
     }
@@ -108,7 +113,7 @@ export default class AddCard extends Component {
                 </View>
                 <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
             </View>
-            <TouchableOpacity style={styles.addButtonStyle} >
+            <TouchableOpacity onPress={() => this.onSaveHandle()} style={styles.addButtonStyle} >
                 <Text style={{ color: custom.mainFontColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>Add</Text>
             </TouchableOpacity>
             {this.state.isShowPicker && this.renderPicker()}
@@ -140,6 +145,7 @@ export default class AddCard extends Component {
         const onConfirm = () => {
             this.setState({ selectedBank: this.state.tempSelectedBank, isShowPicker: false })
         }
+
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
@@ -168,10 +174,10 @@ export default class AddCard extends Component {
     }
 
     renderCardTypePicker() {
-
         const onConfirm = () => {
             this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
         }
+
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowCardTypePicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
@@ -197,6 +203,22 @@ export default class AddCard extends Component {
                 {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
             </Picker>
         </View >
+    }
+
+    onSaveHandle() {
+        let data = {
+            bank: this.state.selectedBank,
+            cardType: this.state.selectedCardType,
+            currentAmount: this.state.amount,
+            creditLimit: this.state.creditLimit,
+            remarks: this.state.remarks
+        }
+        dataStore.allCard.push(data)
+        FireBaseAPI.firebaseAddCard(JSON.stringify(dataStore.allCard), ((res) => {
+            if (res) {
+                this.props.props.navigation.navigate("Home")
+            }
+        }))
     }
 }
 

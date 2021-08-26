@@ -4,7 +4,6 @@ import custom from '../theme/customization';
 
 export default function TopNavBar(props) {
     const navigator = props.props;
-    console.log("WJ navigator", navigator.props)
     return <View style={{ height: 44, width: "100%", justifyContent: "center", flexDirection: "row" }}>
         <View style={{ height: "100%", width: "15%", justifyContent: "flex-end", alignItems: "center" }}>
             {props.backButton && <TouchableOpacity onPress={() => navigator.goBack()}>

@@ -1,9 +1,9 @@
-import React, { useEffect, useState, Component } from 'react'
-import { StyleSheet, View, TouchableOpacity, Image, Text } from 'react-native';
-import FireBaseAPI from '../storageHelper/firebaseAPI';
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Carousel from 'react-native-snap-carousel';
+import dataStore from '../storageHelper/dataStore';
 import custom from '../theme/customization';
-import Carousel from 'react-native-snap-carousel'
-import _ from 'lodash'
 
 export default class Home extends Component {
     constructor(props) {
@@ -12,23 +12,19 @@ export default class Home extends Component {
     }
 
     componentDidMount() {
-        FireBaseAPI.firebaseGetRealTimeData();
+
     }
     
-    onPressHandle() {
-        FireBaseAPI.firebaseAddData({ name: "ahbii1", age: "24" })
-    }
 
     renderCard() {
-        const data = [{ name: '123123' }]
-
+        const data = dataStore.allCard;
         return !_.isEmpty(data) ? <Carousel
             data={data}
-            layout='stack'
+            layout='default'
             loop={true}
             renderItem={({ item, index }) => {
                 return <View style={styles.carouselItem}>
-                    <Text>{item.name}</Text>
+                    <Text>{item.bank}</Text>
                 </View>
             }}
             sliderWidth={SCREEN_W}

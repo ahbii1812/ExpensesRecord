@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app'
+import dataStore from './dataStore';
 
 
-const username = 'ahbii1'
 class firebaseAPI extends Component {
 
     firebaseGetAllData = async () => {
@@ -19,12 +19,12 @@ class firebaseAPI extends Component {
         }
     }
 
-    firebaseGetRealTimeData = async() => {
+    firebaseGetRealTimeData = async () => {
         const AllUsers = await firestore().collection('users');
 
         const observer = AllUsers.onSnapshot(docSnapshot => {
             docSnapshot.forEach(doc => {
-                console.log('Firebase === Document => ',doc.id, ' => ', doc.data());
+                console.log('Firebase === Document => ', doc.id, ' => ', doc.data());
             });
         }, err => {
             console.log('Firebase === Get Real Time Data Err: ', err);
@@ -32,13 +32,29 @@ class firebaseAPI extends Component {
 
     }
 
-     async firebaseAddData(data) {
+    firebaseGetRealTimeOwnData = async () => {
+        const AllUsers = await firestore().collection('users').doc(dataStore.deviceID);
+        const observer = AllUsers.onSnapshot(docSnapshot => {
+            console.log('Firebase === Own Real Time Data => ', JSON.parse(docSnapshot.data().data));
+            dataStore.allCard = JSON.parse(docSnapshot.data().data);
+        }, err => {
+            console.log('Firebase === Get Own Real Time Data Err: ', err);
+        });
+
+    }
+
+    firebaseGetOwnData = async () => {
+        const OwnData = await firestore().collection('users').doc(dataStore.deviceID).get();
+        console.log('Firebase === OwnData.data => ', OwnData.data());
+    }
+
+    async firebaseAddCard(data, callback) {
         const res = await firestore()
-        .collection('users')
-        .doc(username)
-        .set(data)
-        .then(() => console.log("Firebase === Data Added: ", data))
-        .catch(err => console.log("Firebase === Data Add Error: ", err));
+            .collection('users')
+            .doc(dataStore.deviceID)
+            .set({data : data})
+            .then(() => { console.log("Firebase === Data Added: ", data); callback && callback(true) })
+            .catch(err => console.log("Firebase === Data Add Error: ", err));
     }
 
 
