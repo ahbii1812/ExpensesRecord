@@ -1,6 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { Component } from "react";
 import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import ShowToast from "../component/toast";
 import TopNavBar from '../component/topNavBar';
 import dataStore from "../storageHelper/dataStore";
 import FireBaseAPI from "../storageHelper/firebaseAPI";
@@ -62,7 +63,7 @@ export default class AddCard extends Component {
             <TopNavBar props={this.props.props.navigation} title={"Add Card"} backButton />
             <View style={{ width: "100%", marginTop: 35, backgroundColor: custom.minorBgColor }}>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Bank Or Wallet :</Text>
+                    <Text style={styles.textTitleStyle}>Bank / E-Wallet :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowPicker: true }); Keyboard.dismiss() }} >
                         {this.state.selectedBank ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedBank}</Text>
                             :
@@ -99,10 +100,10 @@ export default class AddCard extends Component {
                         <TextInput
                             maxLength={10}
                             keyboardType="numeric"
-                            onChangeText={(text) => { this.onChangeAmount(text) }}
+                            onChangeText={(text) => { this.onChangeCreditLimit(text) }}
                             style={[styles.textInputStyle, { width: "85%" }]}
                             placeholder={"0.00"}
-                            value={this.state.amount}
+                            value={this.state.creditLimit}
                             placeholderTextColor={custom.placeholderTextColor}
                             returnKeyType='done' />
                     </View>
@@ -131,7 +132,7 @@ export default class AddCard extends Component {
         } else { this.setState({ amount: text }) }
     }
 
-    onCreditLimit(text) {
+    onChangeCreditLimit(text) {
         let str = text.toString();
         if (str.includes(".")) {
             let arr = str.split(".");
@@ -206,6 +207,19 @@ export default class AddCard extends Component {
     }
 
     onSaveHandle() {
+        if(this.state.selectedBank == "") {
+            ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
+            return
+        } else if(this.state.selectedCardType == "") {
+            ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
+            return
+        } 
+        if(this.state.amount == "") {
+            this.setState({amount : 0})
+        }
+        if(this.state.creditLimit == "") {
+            this.setState({creditLimit : 0})
+        }
         let data = {
             bank: this.state.selectedBank,
             cardType: this.state.selectedCardType,
@@ -217,6 +231,8 @@ export default class AddCard extends Component {
         FireBaseAPI.firebaseAddCard(JSON.stringify(dataStore.allCard), ((res) => {
             if (res) {
                 this.props.props.navigation.navigate("Home")
+            } else {
+                ShowToast.showShortCenter("Add Card Failed !")
             }
         }))
     }
