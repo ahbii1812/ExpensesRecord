@@ -5,7 +5,8 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import dataStore from '../storageHelper/dataStore';
 import custom from '../theme/customization';
-import FlipCard from 'react-native-flip-card'
+import FlipCard from 'react-native-flip-card';
+import BottomHalfModal from '../component/bottomHalfModal';
 
 export default function Home(props) {
     const navigator = props.props.navigation
@@ -19,7 +20,7 @@ export default function Home(props) {
         return !_.isEmpty(data) ? <Carousel
             data={data}
             layout='stack'
-            loop={false}
+            loop={true}
             renderItem={({ item, index }) => {
                 return <FlipCard
                     friction={6}
@@ -28,7 +29,7 @@ export default function Home(props) {
                     flipVertical={false}
                     flip={false}
                     clickable={true}
-                    onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd) }}
+                    onFlipEnd={(isFlipEnd) => {}}
                 >
                     {/* Face Side */}
                     <View style={styles.carouselItem}>
@@ -57,7 +58,7 @@ export default function Home(props) {
         <View style={{ height: "50%", width: "100%", alignItems: "center", marginTop: 100 }}>
             <RenderCard />
         </View>
-
+        <BottomHalfModal />
     </View>
 
 }

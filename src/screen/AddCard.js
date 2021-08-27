@@ -228,7 +228,7 @@ export default class AddCard extends Component {
             remarks: this.state.remarks
         }
         dataStore.allCard.push(data)
-        FireBaseAPI.firebaseAddCard(JSON.stringify(dataStore.allCard), ((res) => {
+        FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
             if (res) {
                 this.props.props.navigation.navigate("Home")
             } else {

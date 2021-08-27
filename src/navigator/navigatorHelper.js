@@ -41,9 +41,9 @@ function App({ navigation }) {
         <NavigationContainer style={{ backgroundColor: custom.mainBgColor }}>
             <StatusBar translucent backgroundColor="transparent"></StatusBar>
             <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 0 }} />
-            <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 1 }}>
-                <HomePage />
-            </SafeAreaView>
+            {/* <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 1 }}>
+            </SafeAreaView> */}
+            <HomePage />
         </NavigationContainer>
     );
 }
