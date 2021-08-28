@@ -6,9 +6,13 @@ class Customization {
     mainFontColor = "#FFFFFF"
     imageTintColor ="#FFFFFF"
     placeholderTextColor="#696969"
+    transferColor = "#99FF99"
+    expensesColor = "#ff726f"
+    incomeColor = "#66B2FF"
     titleFontSize = 18
     contentFontSize = 16
     navBarTitleFontSize = 24
+    
     
 } 
 

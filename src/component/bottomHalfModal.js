@@ -19,13 +19,13 @@ export default class App extends Component {
                 </View>
 
                 <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-evenly", height: 200, marginTop: 15 }}>
-                    <TouchableOpacity style={styles.buttonContainerStyle}>
+                    <TouchableOpacity onPress={()=> this.props.navigator.navigate("Add Record")} style={styles.buttonContainerStyle}>
                         <Image source={require('../icon/details_icon.png')} resizeMode={"stretch"} style={styles.iconStyle}></Image>
                         <View style={styles.textContainer}>
                             <Text style={styles.buttonTextStyle}>All Record</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonContainerStyle}>
+                    <TouchableOpacity onPress={()=> this.props.navigator.navigate("Add Record")} style={styles.buttonContainerStyle}>
                         <Image source={require('../icon/add_icon.png')} resizeMode={"stretch"} style={styles.iconStyle}></Image>
                         <View style={styles.textContainer}>
                             <Text style={styles.buttonTextStyle}>Add Record</Text>

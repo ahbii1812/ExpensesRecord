@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { Component } from "react";
-import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, ActivityIndicator } from 'react-native';
 import ShowToast from "../component/toast";
 import TopNavBar from '../component/topNavBar';
 import dataStore from "../storageHelper/dataStore";
@@ -11,34 +11,9 @@ export default class AddCard extends Component {
 
     constructor(props) {
         super(props)
+
         this.state = {
-            walletList: [
-                { label: "Aeon Wallet", value: "Aeon Wallet" },
-                { label: "Alipay", value: "Alipay" },
-                { label: "Boost", value: "Boost" },
-                { label: "GrabPay", value: "GrabPay" },
-                { label: "MAE Wallet", value: "MAE Wallet" },
-                { label: "Paypal", value: "Paypal" },
-                { label: "Shopee Pay", value: "Shopee Pay" },
-                { label: "Touch n Go", value: "Touch n Go" },
-                { label: "Others", value: "Others" }
-            ],
-            cardList: [
-                { label: "Affin Bank", value: "Affin Bank" },
-                { label: "Agro Bank", value: "Agro Bank" },
-                { label: "AmBank", value: "AmBank" },
-                { label: "CIMB Bank", value: "CIMB Bank" },
-                { label: "Exim Bank", value: "Exim Bank" },
-                { label: "HSBC Bank", value: "HSBC Bank" },
-                { label: "Hong Leong Bank", value: "Hong Leong Bank" },
-                { label: "Maybank", value: "Maybank" },
-                { label: "OCBC Bank", value: "OCBC Bank" },
-                { label: "Public Bank", value: "Public Bank" },
-                { label: "RHB Bank", value: "RHB Bank" },
-                { label: "Standard Chartered Bank", value: "Standard Chartered Bank" },
-                { label: "UOB Bank", value: "UOB Bank" },
-                { label: "Others", value: "Others" },
-            ],
+            cardList: [],
             selectedCard: "",
             tempSelectedCard: "",
             isShowPicker: false,
@@ -50,20 +25,40 @@ export default class AddCard extends Component {
             selectedCardType: "",
             isShowCardTypePicker: false,
             amount: "",
-            creditLimit: "",
-            remarks: ""
+            remarks: "",
+            isLoadFinish: true,
+            categorizedCard: [],
+            selectedRecordType: "Income"
         }
 
     }
 
     componentDidMount() {
+        let categorizedCard = Object.values(dataStore.allCard.reduce((card, item) => {
+            if (!card[item.cardType]) card[item.cardType] = {
+                cardType: item.cardType,
+                availableCard: []
+            };
+            card[item.cardType].availableCard.push(item);
+            return card;
+        }, {}))
+
+        this.setState({ categorizedCard: categorizedCard });
         this.setState({ tempSelectCardType: this.state.cardTypeList[0].value })
     }
 
     render() {
         return <View style={{ height: "100%", width: "100%", backgroundColor: custom.mainBgColor, alignItems: "center" }}>
-            <TopNavBar props={this.props.props.navigation} title={"Add Card"} backButton />
-            <View style={{ width: "100%", marginTop: 35, backgroundColor: custom.minorBgColor }}>
+            <TopNavBar props={this.props.props.navigation} title={"Add Record"} backButton />
+            <View style={{ height: 40, width: "100%", marginVertical: 40, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
+                <TouchableOpacity onPress={() => { this.setState({ selectedRecordType: "Income" }) }} style={[styles.tabButtonStyle, { borderColor: this.state.selectedRecordType == "Income" ? custom.incomeColor : custom.mainFontColor }]}>
+                    <Text style={[styles.textTypeStyle, { color: this.state.selectedRecordType == "Income" ? custom.incomeColor : custom.mainFontColor }]}>Income</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { this.setState({ selectedRecordType: "Expenses" }) }} style={[styles.tabButtonStyle, { borderColor: this.state.selectedRecordType == "Expenses" ? custom.expensesColor : custom.mainFontColor }]}>
+                    <Text style={[styles.textTypeStyle, { color: this.state.selectedRecordType == "Expenses" ? custom.expensesColor : custom.mainFontColor }]}>Expenses</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={{ width: "100%", backgroundColor: custom.minorBgColor }}>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Type :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowCardTypePicker: true }); Keyboard.dismiss() }} >
@@ -81,7 +76,7 @@ export default class AddCard extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Balance :</Text>
+                    <Text style={styles.textTitleStyle}>Amount :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
                         <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
                         <TextInput
@@ -95,21 +90,6 @@ export default class AddCard extends Component {
                             returnKeyType='done' />
                     </View>
                 </View>
-                {this.state.selectedCardType == "Credit Card" && <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Credit Limit :</Text>
-                    <View style={{ width: "60%", flexDirection: "row" }}>
-                        <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
-                        <TextInput
-                            maxLength={10}
-                            keyboardType="numeric"
-                            onChangeText={(text) => { this.onChangeCreditLimit(text) }}
-                            style={[styles.textInputStyle, { width: "85%" }]}
-                            placeholder={"0.00"}
-                            value={this.state.creditLimit}
-                            placeholderTextColor={custom.placeholderTextColor}
-                            returnKeyType='done' />
-                    </View>
-                </View>}
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Remarks :</Text>
                     <TextInput style={styles.textInputStyle}></TextInput>
@@ -117,20 +97,17 @@ export default class AddCard extends Component {
                 <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
             </View>
             <TouchableOpacity onPress={() => this.onSaveHandle()} style={styles.addButtonStyle} >
-                <Text style={{ color: custom.mainFontColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>Add</Text>
+                <Text style={{ color: this.state.selectedRecordType == "Income" ? custom.incomeColor : custom.expensesColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>{"Add " + this.state.selectedRecordType}</Text>
             </TouchableOpacity>
             {this.state.isShowPicker && this.renderPicker()}
             {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
+            {!this.state.isLoadFinish && <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
+                <ActivityIndicator size="large" color="#FFFFFF" />
+            </View>}
         </View>
     }
 
     handleCardNameClick() {
-        if (this.state.selectedCardType == "E-Wallet") {
-            this.setState({ tempSelectedCard: this.state.walletList[0].value })
-        } else {
-            this.setState({ tempSelectedCard: this.state.cardList[0].value })
-        }
-
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Card Type...")
             Keyboard.dismiss()
@@ -148,16 +125,6 @@ export default class AddCard extends Component {
                 this.setState({ amount: text })
             }
         } else { this.setState({ amount: text }) }
-    }
-
-    onChangeCreditLimit(text) {
-        let str = text.toString();
-        if (str.includes(".")) {
-            let arr = str.split(".");
-            if (arr?.[1]?.length < 3) {
-                this.setState({ creditLimit: text })
-            }
-        } else { this.setState({ creditLimit: text }) }
     }
 
     renderPicker() {
@@ -183,11 +150,11 @@ export default class AddCard extends Component {
             <Picker
                 style={{ backgroundColor: "#808080", height: "30%" }}
                 selectedValue={this.state.tempSelectedCard}
-            onValueChange={(itemValue, itemIndex) =>{
-                this.setState({ tempSelectedCard: itemValue })}}
+                onValueChange={(itemValue, itemIndex) =>
+                    this.setState({ tempSelectedCard: itemValue })}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
-                {this.state.selectedCardType == "E-Wallet" ? this.state.walletList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />) : this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
+                {this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
             </Picker>
         </View >
     }
@@ -195,6 +162,7 @@ export default class AddCard extends Component {
     renderCardTypePicker() {
         const onConfirm = () => {
             this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
+            this.updateCardList();
         }
 
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
@@ -216,8 +184,7 @@ export default class AddCard extends Component {
                 style={{ backgroundColor: "#808080", height: "30%" }}
                 selectedValue={this.state.tempSelectCardType}
                 onValueChange={(itemValue, itemIndex) =>{
-                    this.setState({ tempSelectedCard : "", selectedCard: ""})
-                    this.setState({ tempSelectCardType: itemValue })}}
+                    this.setState({ tempSelectCardType: itemValue, selectedCard: "", tempSelectedCard: "" })}}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
                 {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
@@ -225,9 +192,36 @@ export default class AddCard extends Component {
         </View >
     }
 
+    updateCardList() {
+        this.setState({ isLoadFinish: false })
+        let tempCard = []
+        let tempCardList = []
+        let pushPickerList = []
+        this.state.categorizedCard.map((item) => {
+            if (item.cardType == this.state.tempSelectCardType) {
+                tempCard = item.availableCard;
+            }
+        })
+
+        tempCard.map((item) => {
+            if (!tempCardList.includes(item.bank)) {
+                tempCardList.push(item.bank)
+                pushPickerList.push({ value: item.bank, label: item.bank })
+            }
+        })
+
+
+        this.setState({ cardList: pushPickerList })
+        console.log("WJ pushPickerList", pushPickerList)
+        setTimeout(() => {
+            this.setState({ isLoadFinish: true, tempSelectedCard: pushPickerList[0]?.value })
+        }, 300);
+
+    }
+
     onSaveHandle() {
         if (this.state.selectedCardType == "") {
-            ShowToast.showShortCenter("Please Select Card Type !")
+            ShowToast.showShortCenter("Please Select Type !")
             return
         } else if (this.state.selectedCard == "") {
             ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
@@ -236,22 +230,19 @@ export default class AddCard extends Component {
         if (this.state.amount == "") {
             this.setState({ amount: 0 })
         }
-        if (this.state.creditLimit == "") {
-            this.setState({ creditLimit: 0 })
-        }
         let data = {
             bank: this.state.selectedCard,
             cardType: this.state.selectedCardType,
-            currentAmount: this.state.amount,
-            creditLimit: this.state.creditLimit,
-            remarks: this.state.remarks
+            amount: this.state.amount,
+            remarks: this.state.remarks,
+            recordType: this.state.selectedRecordType
         }
-        dataStore.allCard.push(data)
-        FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
+        dataStore.allRecord.push(data)
+        FireBaseAPI.firebaseAddRecord(dataStore.allRecord, ((res) => {
             if (res) {
                 this.props.props.navigation.navigate("Home")
             } else {
-                ShowToast.showShortCenter("Add Card Failed !")
+                ShowToast.showShortCenter("Add Record Failed !")
             }
         }))
     }
@@ -280,6 +271,11 @@ const styles = StyleSheet.create({
         color: custom.mainFontColor,
         width: "35%"
     },
+    textTypeStyle: {
+        fontWeight: "bold",
+        fontSize: custom.titleFontSize,
+        color: custom.mainFontColor,
+    },
     addButtonStyle: {
         marginTop: 50,
         backgroundColor:
@@ -287,6 +283,14 @@ const styles = StyleSheet.create({
         width: "90%",
         borderRadius: 15,
         height: 50,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    tabButtonStyle: {
+        width: "40%",
+        height: "100%",
+        borderRadius: 8,
+        borderWidth: 2,
         justifyContent: "center",
         alignItems: "center"
     }

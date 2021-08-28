@@ -36,7 +36,8 @@ class firebaseAPI extends Component {
         const AllUsers = await firestore().collection('users').doc(dataStore.deviceID);
         const observer = AllUsers.onSnapshot(docSnapshot => {
             dataStore.allCard = docSnapshot.data()?.data ? docSnapshot.data().data : [];
-            console.log('Firebase === Own Real Time Data => ', dataStore.allCard);
+            dataStore.allRecord = docSnapshot.data()?.record ? docSnapshot.data().record : [];
+            console.log('Firebase === Own Real Time Data => ', docSnapshot.data());
         }, err => {
             console.log('Firebase === Get Own Real Time Data Err: ', err);
         });
@@ -50,9 +51,16 @@ class firebaseAPI extends Component {
 
     async firebaseAddCard(data, callback) {
         const res = await firestore()
-            .collection('users')
-            .doc(dataStore.deviceID)
-            .set({ data: data })
+            .doc('users/' + dataStore.deviceID)
+            .update({ data: data })
+            .then(() => { console.log("Firebase === Data Added: ", data); callback && callback(true) })
+            .catch(err => console.log("Firebase === Data Add Error: ", err));
+    }
+
+    async firebaseAddRecord(data, callback) {
+        const res = await firestore()
+            .doc('users/' + dataStore.deviceID)
+            .update({ record: data })
             .then(() => { console.log("Firebase === Data Added: ", data); callback && callback(true) })
             .catch(err => console.log("Firebase === Data Add Error: ", err));
     }

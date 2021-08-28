@@ -8,6 +8,7 @@ class DataStore {
 
   }
   @observable allCard = []
+  @observable allRecord = []
   @observable deviceID = ""
 
   getDeviceID(callback) {

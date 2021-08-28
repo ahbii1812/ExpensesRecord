@@ -58,7 +58,7 @@ export default function Home(props) {
         <View style={{ height: "50%", width: "100%", alignItems: "center", marginTop: 100 }}>
             <RenderCard />
         </View>
-        <BottomHalfModal />
+        <BottomHalfModal navigator={navigator}/>
     </View>
 
 }

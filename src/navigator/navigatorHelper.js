@@ -16,6 +16,7 @@ import AddCard from '../screen/AddCard'
 import Home from '../screen/Home';
 import custom from '../theme/customization';
 import SplashScreen from '../screen/Splash'
+import AddRecord from '../screen/AddRecord'
 
 function HomePage({ navigation }) {
     return (
@@ -29,6 +30,9 @@ function HomePage({ navigation }) {
             </Stack.Screen>
             <Stack.Screen name="Add Card" >
                 {props => <AddCard props={props} />}
+            </Stack.Screen>
+            <Stack.Screen name="Add Record" >
+                {props => <AddRecord props={props} />}
             </Stack.Screen>
         </Stack.Navigator>)
 
