@@ -32,7 +32,8 @@
     "react-native-root-toast-updated": "^3.2.2",
     "react-native-safe-area-context": "^3.3.0",
     "react-native-screens": "^3.6.0",
-    "react-native-snap-carousel": "^3.9.1"
+    "react-native-snap-carousel": "^3.9.1",
+    "react-native-swipeout": "^2.3.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
