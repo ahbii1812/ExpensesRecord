@@ -33,7 +33,7 @@ export default function Home(props) {
                 >
                     {/* Face Side */}
                     <View style={styles.carouselItem}>
-                        <Text>{item.bank}</Text>
+                        <Text>{item.cardBrand}</Text>
                     </View>
                     {/* Back Side */}
                     <View style={styles.carouselItem}>

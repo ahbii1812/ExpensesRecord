@@ -1,6 +1,6 @@
 import { observable } from "mobx";
 import StorageUtils from "./storageUtils";
-import moment from "moment";
+import Moment from "moment";
 import DeviceInfo from 'react-native-device-info'
 
 class DataStore {
@@ -16,18 +16,16 @@ class DataStore {
     callback && callback(this.deviceID)
   }
 
-  getDateSortedRecord(callback) {
-    let itemListByDate = Object.values(data.reduce((acc, item) => {
-      if (!acc[item.Date]) acc[item.Date] = {
-        Date: item.Date,
-        ItemDetails: []
+  getDateSortedRecord(data, callback) {
+    let recordListByDate = Object.values(data.reduce((record, item) => {
+      if (!record[item.date]) record[item.date] = {
+        title: item.date,
+        data: []
       };
-      acc[item.Date].ItemDetails.push(item);
-      return acc;
+      record[item.date].data.push(item);
+      return record;
     }, {}))
-    console.log("WJ itemListByDate", itemListByDate)
-    const sortedByDate = itemListByDate.sort((a, b) => new moment(b.Date).format('DDMMYYYY') - new moment(a.Date).format('DDMMYYYY'))
-    console.log("WJ sortedByDate", sortedByDate)
+    const sortedByDate  = recordListByDate.sort((a,b) => new Moment(b.title).format('YYYYMMDD') - new Moment(a.title).format('YYYYMMDD'))
     return callback && callback(sortedByDate)
   }
 

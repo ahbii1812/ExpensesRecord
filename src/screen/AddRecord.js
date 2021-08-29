@@ -16,8 +16,8 @@ export default class AddCard extends Component {
 
         this.state = {
             cardList: [],
-            selectedCard: "",
-            tempSelectedCard: "",
+            selectedCardBrand: "",
+            tempSelectedCardBrand: "",
             isShowPicker: false,
             cardTypeList: [
                 { label: "Credit Card", value: "Credit Card" },
@@ -77,11 +77,11 @@ export default class AddCard extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Bank / E-Wallet :</Text>
+                    <Text style={styles.textTitleStyle}>Bank Brand :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
-                        {this.state.selectedCard ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCard}</Text>
+                        {this.state.selectedCardBrand ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardBrand}</Text>
                             :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Bank...</Text>}
+                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Brand...</Text>}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
@@ -101,7 +101,11 @@ export default class AddCard extends Component {
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Remarks :</Text>
-                    <TextInput style={styles.textInputStyle}></TextInput>
+                    <TextInput 
+                        placeholder={"Tap to Type"}
+                        placeholderTextColor={custom.placeholderTextColor}
+                        style={styles.textInputStyle}
+                        onChangeText={(text) => { this.setState({ remarks: text }) }}></TextInput>
                 </View>
                 <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
             </View>
@@ -111,14 +115,16 @@ export default class AddCard extends Component {
             {this.state.isShowPicker && this.renderPicker()}
             {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
             <DatePickerModal ref={component => { this._datepicker = component }} onChangeDate={this.updateLatestDate} currDate={this.state.date} />
-            {!this.state.isLoadFinish && <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
-                <ActivityIndicator size="large" color="#FFFFFF" />
-            </View>}
-        </View>
+            {
+                !this.state.isLoadFinish && <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
+                    <ActivityIndicator size="large" color="#FFFFFF" />
+                </View>
+            }
+        </View >
     }
 
     updateLatestDate = (newDate) => {
-        this.setState({date : newDate})
+        this.setState({ date: newDate })
     }
 
     handleCardNameClick() {
@@ -143,10 +149,10 @@ export default class AddCard extends Component {
 
     renderPicker() {
         const onConfirm = () => {
-            this.setState({ selectedCard: this.state.tempSelectedCard, isShowPicker: false })
+            this.setState({ selectedCardBrand: this.state.tempSelectedCardBrand, isShowPicker: false })
         }
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end"}}>
+        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
             </TouchableWithoutFeedback>
@@ -163,9 +169,9 @@ export default class AddCard extends Component {
             </View>
             <Picker
                 style={{ backgroundColor: custom.pickerColor, height: "30%" }}
-                selectedValue={this.state.tempSelectedCard}
+                selectedValue={this.state.tempSelectedCardBrand}
                 onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ tempSelectedCard: itemValue })}
+                    this.setState({ tempSelectedCardBrand: itemValue })}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
                 {this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
@@ -198,7 +204,7 @@ export default class AddCard extends Component {
                 style={{ backgroundColor: custom.pickerColor, height: "30%" }}
                 selectedValue={this.state.tempSelectCardType}
                 onValueChange={(itemValue, itemIndex) => {
-                    this.setState({ tempSelectCardType: itemValue, selectedCard: "", tempSelectedCard: "" })
+                    this.setState({ tempSelectCardType: itemValue, selectedCardBrand: "", tempSelectedCardBrand: "" })
                 }}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
@@ -219,17 +225,16 @@ export default class AddCard extends Component {
         })
 
         tempCard.map((item) => {
-            if (!tempCardList.includes(item.bank)) {
-                tempCardList.push(item.bank)
-                pushPickerList.push({ value: item.bank, label: item.bank })
+            if (!tempCardList.includes(item.cardBrand)) {
+                tempCardList.push(item.cardBrand)
+                pushPickerList.push({ value: item.cardBrand, label: item.cardBrand })
             }
         })
 
 
         this.setState({ cardList: pushPickerList })
-        console.log("WJ pushPickerList", pushPickerList)
         setTimeout(() => {
-            this.setState({ isLoadFinish: true, tempSelectedCard: pushPickerList[0]?.value })
+            this.setState({ isLoadFinish: true, tempSelectedCardBrand: pushPickerList[0]?.value })
         }, 300);
 
     }
@@ -238,8 +243,8 @@ export default class AddCard extends Component {
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Type !")
             return
-        } else if (this.state.selectedCard == "") {
-            ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
+        } else if (this.state.selectedCardBrand == "") {
+            ShowToast.showShortCenter("Please Select Brand !")
             return
         }
         if (this.state.amount == "") {
@@ -247,7 +252,7 @@ export default class AddCard extends Component {
         }
         let data = {
             date: moment(this.state.date).format('D MMMM YYYY'),
-            bank: this.state.selectedCard,
+            cardBrand: this.state.selectedCardBrand,
             cardType: this.state.selectedCardType,
             amount: this.state.amount,
             remarks: this.state.remarks,

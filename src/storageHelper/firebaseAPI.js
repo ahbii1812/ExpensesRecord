@@ -65,6 +65,17 @@ class firebaseAPI extends Component {
             .catch(err => console.log("Firebase === Data Add Error: ", err));
     }
 
+    updateRecord(data, callback) {
+        firebase.firestore()
+            .collection('users')
+            .doc(dataStore.deviceID)
+            .set(
+                { record: data },
+                { merge: true }
+            ).then(() => { console.log("Firebase === Data updated: ", data); callback && callback(true) })
+            .catch(err => console.log("Firebase === Data update Error: ", err));
+    }
+
 
 
 }

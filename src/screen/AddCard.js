@@ -39,7 +39,7 @@ export default class AddCard extends Component {
                 { label: "UOB Bank", value: "UOB Bank" },
                 { label: "Others", value: "Others" },
             ],
-            selectedCard: "",
+            selectedCardBrand: "",
             tempSelectedCard: "",
             isShowPicker: false,
             cardTypeList: [
@@ -51,7 +51,7 @@ export default class AddCard extends Component {
             isShowCardTypePicker: false,
             amount: "",
             creditLimit: "",
-            remarks: ""
+            cardName: ""
         }
 
     }
@@ -73,11 +73,11 @@ export default class AddCard extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Bank / E-Wallet :</Text>
+                    <Text style={styles.textTitleStyle}>Card Brand :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
-                        {this.state.selectedCard ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCard}</Text>
+                        {this.state.selectedCardBrand ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardBrand}</Text>
                             :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Bank...</Text>}
+                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Brand...</Text>}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
@@ -111,8 +111,13 @@ export default class AddCard extends Component {
                     </View>
                 </View>}
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Remarks :</Text>
-                    <TextInput style={styles.textInputStyle}></TextInput>
+                    <Text style={styles.textTitleStyle}>Card Name :</Text>
+                    <TextInput 
+                    placeholder={"Default (Card Brand)"} 
+                    placeholderTextColor={custom.placeholderTextColor} 
+                    style={styles.textInputStyle}
+                    value={this.state.cardName}
+                    onChangeText={(text) => { this.setState({cardName : text}) }}></TextInput>
                 </View>
                 <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
             </View>
@@ -162,7 +167,7 @@ export default class AddCard extends Component {
 
     renderPicker() {
         const onConfirm = () => {
-            this.setState({ selectedCard: this.state.tempSelectedCard, isShowPicker: false })
+            this.setState({ selectedCardBrand: this.state.tempSelectedCard, isShowPicker: false })
         }
 
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
@@ -216,7 +221,7 @@ export default class AddCard extends Component {
                 style={{ backgroundColor: "#808080", height: "30%" }}
                 selectedValue={this.state.tempSelectCardType}
                 onValueChange={(itemValue, itemIndex) =>{
-                    this.setState({ tempSelectedCard : "", selectedCard: ""})
+                    this.setState({ tempSelectedCard : "", selectedCardBrand: ""})
                     this.setState({ tempSelectCardType: itemValue })}}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
@@ -229,7 +234,7 @@ export default class AddCard extends Component {
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Card Type !")
             return
-        } else if (this.state.selectedCard == "") {
+        } else if (this.state.selectedCardBrand == "") {
             ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
             return
         }
@@ -240,11 +245,11 @@ export default class AddCard extends Component {
             this.setState({ creditLimit: 0 })
         }
         let data = {
-            bank: this.state.selectedCard,
+            cardBrand: this.state.selectedCardBrand,
             cardType: this.state.selectedCardType,
             currentAmount: this.state.amount,
             creditLimit: this.state.creditLimit,
-            remarks: this.state.remarks
+            cardName: this.state.cardName
         }
         dataStore.allCard.push(data)
         FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
