@@ -6,6 +6,8 @@ import TopNavBar from '../component/topNavBar';
 import dataStore from "../storageHelper/dataStore";
 import FireBaseAPI from "../storageHelper/firebaseAPI";
 import custom from "../theme/customization";
+import moment from "moment";
+import DatePickerModal from "../component/datePickerModal";
 
 export default class AddCard extends Component {
 
@@ -28,7 +30,8 @@ export default class AddCard extends Component {
             remarks: "",
             isLoadFinish: true,
             categorizedCard: [],
-            selectedRecordType: "Income"
+            selectedRecordType: "Income",
+            date: new Date()
         }
 
     }
@@ -59,6 +62,12 @@ export default class AddCard extends Component {
                 </TouchableOpacity>
             </View>
             <View style={{ width: "100%", backgroundColor: custom.minorBgColor }}>
+                <View style={styles.textRowItemStyle}>
+                    <Text style={styles.textTitleStyle}>Date :</Text>
+                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this._datepicker.setModalVisible(true); Keyboard.dismiss() }} >
+                        <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{moment(this.state.date).format('D MMMM YYYY')}</Text>
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Type :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowCardTypePicker: true }); Keyboard.dismiss() }} >
@@ -101,10 +110,15 @@ export default class AddCard extends Component {
             </TouchableOpacity>
             {this.state.isShowPicker && this.renderPicker()}
             {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
+            <DatePickerModal ref={component => { this._datepicker = component }} onChangeDate={this.updateLatestDate} currDate={this.state.date} />
             {!this.state.isLoadFinish && <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
             </View>}
         </View>
+    }
+
+    updateLatestDate = (newDate) => {
+        this.setState({date : newDate})
     }
 
     handleCardNameClick() {
@@ -132,11 +146,11 @@ export default class AddCard extends Component {
             this.setState({ selectedCard: this.state.tempSelectedCard, isShowPicker: false })
         }
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
+        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end"}}>
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
             </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: "#696969", flexDirection: "row" }}>
+            <View style={{ height: 44, width: "100%", backgroundColor: custom.pickerColor, flexDirection: "row" }}>
                 <TouchableOpacity onPress={() => { this.setState({ isShowPicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
                 </TouchableOpacity>
@@ -148,7 +162,7 @@ export default class AddCard extends Component {
                 </TouchableOpacity>
             </View>
             <Picker
-                style={{ backgroundColor: "#808080", height: "30%" }}
+                style={{ backgroundColor: custom.pickerColor, height: "30%" }}
                 selectedValue={this.state.tempSelectedCard}
                 onValueChange={(itemValue, itemIndex) =>
                     this.setState({ tempSelectedCard: itemValue })}
@@ -169,7 +183,7 @@ export default class AddCard extends Component {
             <TouchableWithoutFeedback onPress={() => { this.setState({ isShowCardTypePicker: false }) }}>
                 <View style={{ width: "100%", height: "70%" }} />
             </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: "#696969", flexDirection: "row" }}>
+            <View style={{ height: 44, width: "100%", backgroundColor: custom.pickerColor, flexDirection: "row" }}>
                 <TouchableOpacity onPress={() => { this.setState({ isShowCardTypePicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
                 </TouchableOpacity>
@@ -181,10 +195,11 @@ export default class AddCard extends Component {
                 </TouchableOpacity>
             </View>
             <Picker
-                style={{ backgroundColor: "#808080", height: "30%" }}
+                style={{ backgroundColor: custom.pickerColor, height: "30%" }}
                 selectedValue={this.state.tempSelectCardType}
-                onValueChange={(itemValue, itemIndex) =>{
-                    this.setState({ tempSelectCardType: itemValue, selectedCard: "", tempSelectedCard: "" })}}
+                onValueChange={(itemValue, itemIndex) => {
+                    this.setState({ tempSelectCardType: itemValue, selectedCard: "", tempSelectedCard: "" })
+                }}
                 itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
             >
                 {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
@@ -231,6 +246,7 @@ export default class AddCard extends Component {
             this.setState({ amount: 0 })
         }
         let data = {
+            date: moment(this.state.date).format('D MMMM YYYY'),
             bank: this.state.selectedCard,
             cardType: this.state.selectedCardType,
             amount: this.state.amount,

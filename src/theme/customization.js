@@ -2,6 +2,7 @@ class Customization {
     borderColor = "#708090"
     mainBgColor = "#222222"
     minorBgColor="#2f2f2f"
+    pickerColor="#353839"
     SubAccountTilte = "#616161"
     mainFontColor = "#FFFFFF"
     imageTintColor ="#FFFFFF"
