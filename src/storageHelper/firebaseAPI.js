@@ -32,14 +32,16 @@ class firebaseAPI extends Component {
 
     }
 
-    firebaseGetRealTimeOwnData = async () => {
+    firebaseGetRealTimeOwnData = async (callback) => {
         const AllUsers = await firestore().collection('users').doc(dataStore.deviceID);
         const observer = AllUsers.onSnapshot(docSnapshot => {
             dataStore.allCard = docSnapshot.data()?.data ? docSnapshot.data().data : [];
             dataStore.allRecord = docSnapshot.data()?.record ? docSnapshot.data().record : [];
             console.log('Firebase === Own Real Time Data => ', docSnapshot.data());
+            callback && callback(true)
         }, err => {
             console.log('Firebase === Get Own Real Time Data Err: ', err);
+            callback && callback(true)
         });
 
     }

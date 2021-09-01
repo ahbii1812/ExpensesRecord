@@ -33,11 +33,23 @@ export default function Home(props) {
                 >
                     {/* Face Side */}
                     <View style={styles.carouselItem}>
-                        <Text>{item.cardBrand}</Text>
+                        <View style={{height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15}}>
+                            <Text style={{fontSize: 30, fontWeight: "bold"}}>{item.cardBrand}</Text>
+                        </View>
+                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10}}>
+                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>Card Name : {item.cardBrand}</Text>
+                        </View>
                     </View>
                     {/* Back Side */}
                     <View style={styles.carouselItem}>
-                        <Text>"Back"</Text>
+                        <View style={{height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15}}>
+                            <Text style={{fontSize: 30, fontWeight: "bold"}}>{item.cardBrand}</Text>
+                        </View>
+                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10}}>
+                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>Card Type : {item.cardType}</Text>
+                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5}}>{item.cardType == "Credit Card" ? "Outstanding Balance : " : "Current Balance : "}RM {parseFloat(item.currentAmount).toFixed(2)}</Text>
+                            {item.cardType == "Credit Card" && <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5}}>Credit Limit : RM {parseFloat(item.creditLimit).toFixed(2)}</Text>}
+                        </View>
                     </View>
                 </FlipCard>
             }}
@@ -80,7 +92,7 @@ const styles = StyleSheet.create({
     },
     carouselItem: {
         marginTop: 20,
-        backgroundColor: "red",
+        backgroundColor: "white",
         width: 350,
         height: 200,
         borderRadius: 10,

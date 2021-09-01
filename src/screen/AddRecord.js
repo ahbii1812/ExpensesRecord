@@ -101,7 +101,7 @@ export default class AddCard extends Component {
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Remarks :</Text>
-                    <TextInput 
+                    <TextInput
                         placeholder={"Tap to Type"}
                         placeholderTextColor={custom.placeholderTextColor}
                         style={styles.textInputStyle}
@@ -250,6 +250,15 @@ export default class AddCard extends Component {
         if (this.state.amount == "") {
             this.setState({ amount: 0 })
         }
+        dataStore.allCard.map(item => {
+            if (item.cardBrand == this.state.selectedCardBrand && item.cardType == this.state.selectedCardType) {
+                if (this.state.selectedRecordType == "Income") {
+                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
+                } else if (this.state.selectedRecordType == "Expenses") {
+                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
+                }
+            }
+        })
         let data = {
             date: moment(this.state.date).format('D MMMM YYYY'),
             cardBrand: this.state.selectedCardBrand,
@@ -259,11 +268,15 @@ export default class AddCard extends Component {
             recordType: this.state.selectedRecordType
         }
         dataStore.allRecord.push(data)
-        FireBaseAPI.firebaseAddRecord(dataStore.allRecord, ((res) => {
+        FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
             if (res) {
-                this.props.props.navigation.navigate("Home")
-            } else {
-                ShowToast.showShortCenter("Add Record Failed !")
+                FireBaseAPI.firebaseAddRecord(dataStore.allRecord, ((res2) => {
+                    if (res2) {
+                        this.props.props.navigation.navigate("Home")
+                    } else {
+                        ShowToast.showShortCenter("Add Record Failed !")
+                    }
+                }))
             }
         }))
     }
