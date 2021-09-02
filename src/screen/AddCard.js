@@ -239,10 +239,10 @@ export default class AddCard extends Component {
             return
         }
         if (this.state.amount == "") {
-            this.setState({ amount: 0 })
+            this.setState({ amount: 0.00 })
         }
         if (this.state.creditLimit == "") {
-            this.setState({ creditLimit: 0 })
+            this.setState({ creditLimit: 0.00 })
         }
         let data = {
             cardBrand: this.state.selectedCardBrand,

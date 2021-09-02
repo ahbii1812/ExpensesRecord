@@ -20,7 +20,7 @@ export default function Home(props) {
         return !_.isEmpty(data) ? <Carousel
             data={data}
             layout='stack'
-            loop={true}
+            loop={false}
             renderItem={({ item, index }) => {
                 return <FlipCard
                     friction={6}
@@ -29,26 +29,29 @@ export default function Home(props) {
                     flipVertical={false}
                     flip={false}
                     clickable={true}
-                    onFlipEnd={(isFlipEnd) => {}}
+                    onFlipEnd={(isFlipEnd) => { }}
                 >
                     {/* Face Side */}
                     <View style={styles.carouselItem}>
-                        <View style={{height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15}}>
-                            <Text style={{fontSize: 30, fontWeight: "bold"}}>{item.cardBrand}</Text>
+                        <View style={{ height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15 }}>
+                            <Text style={{ fontSize: 30, fontWeight: "bold" }}>{item.cardBrand}</Text>
                         </View>
-                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10}}>
-                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>Card Name : {item.cardBrand}</Text>
+                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10 }}>
+                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Name : {item.cardBrand}</Text>
                         </View>
+                        <TouchableOpacity style={{position: "absolute", bottom: 15, right : 20}} onPress={() => { navigator.navigate("All Record", item) }}>
+                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>{"Details >>"}</Text>
+                        </TouchableOpacity>
                     </View>
                     {/* Back Side */}
                     <View style={styles.carouselItem}>
-                        <View style={{height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15}}>
-                            <Text style={{fontSize: 30, fontWeight: "bold"}}>{item.cardBrand}</Text>
+                        <View style={{ height: 44, width: "80%", marginLeft: 14, justifyContent: "center", marginTop: 15 }}>
+                            <Text style={{ fontSize: 30, fontWeight: "bold" }}>{item.cardBrand}</Text>
                         </View>
-                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10}}>
-                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>Card Type : {item.cardType}</Text>
-                            <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5}}>{item.cardType == "Credit Card" ? "Outstanding Balance : " : "Current Balance : "}RM {parseFloat(item.currentAmount).toFixed(2)}</Text>
-                            {item.cardType == "Credit Card" && <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5}}>Credit Limit : RM {parseFloat(item.creditLimit).toFixed(2)}</Text>}
+                        <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10 }}>
+                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Type : {item.cardType}</Text>
+                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5 }}>{item.cardType == "Credit Card" ? "Outstanding Balance : " : "Current Balance : "}RM {isNaN(parseFloat(item.currentAmount).toFixed(2)) ? "0.00" : parseFloat(item.currentAmount).toFixed(2)}</Text>
+                            {item.cardType == "Credit Card" && <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold", marginTop: 5 }}>Credit Limit : RM {isNaN(parseFloat(item.creditLimit).toFixed(2))? "0.00" : parseFloat(item.creditLimit).toFixed(2)}</Text>}
                         </View>
                     </View>
                 </FlipCard>
@@ -70,7 +73,7 @@ export default function Home(props) {
         <View style={{ height: "50%", width: "100%", alignItems: "center", marginTop: 100 }}>
             <RenderCard />
         </View>
-        <BottomHalfModal navigator={navigator}/>
+        <BottomHalfModal navigator={navigator} />
     </View>
 
 }

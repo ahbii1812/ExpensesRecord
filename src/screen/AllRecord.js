@@ -14,26 +14,50 @@ export default class AllRecord extends Component {
         this.state = {
             update: false,
             listData: [{ title: "", data: [] }],
-            isLoadFinish: false
+            isLoadFinish: false,
+            unUsedList: []
         }
     }
 
     componentDidMount() {
-        dataStore.getDateSortedRecord(dataStore.allRecord, (res) => {
-            this.setState({ listData: res })
-            this.setState({ isLoadFinish: true })
-        })
+        let tempDataList = []
+        let tempUnUsedList = []
+        if (this.props.props.route.params) {
+            let tempCardBrand = this.props.props.route.params.cardBrand
+            let tempCardType = this.props.props.route.params.cardType
+            dataStore.allRecord.length > 0 && dataStore.allRecord.map((item) => {
+                if (item.cardType == tempCardType && item.cardBrand == tempCardBrand) {
+                    tempDataList.push(item)
+                } else {
+                    tempUnUsedList.push(item)
+                }
+            })
+            dataStore.getDateSortedRecord(tempDataList, (res) => {
+                this.setState({ listData: res })
+                this.setState({ unUsedList: tempUnUsedList })
+                this.setState({ isLoadFinish: true })
+            })
+        } else {
+            dataStore.getDateSortedRecord(dataStore.allRecord, (res) => {
+                this.setState({ listData: res })
+                this.setState({ isLoadFinish: true })
+            })
+        }
+
     }
 
     updateList() {
         this.setState({ isLoadFinish: false })
         let tempArr = []
         this.setState({ update: !this.state.update })
+
+        this.state.unUsedList.length > 0 && this.state.unUsedList.map((item) => {
+            tempArr.push(item)
+        })
         this.state.listData.map((item) => {
             item.data.map((o, i) => {
                 tempArr.push(item.data[i])
             })
-
         })
         FireBaseAPI.updateRecord(tempArr, res => {
             setTimeout(() => {
@@ -52,7 +76,7 @@ export default class AllRecord extends Component {
         let isLast = props.index + 1 == props.section.data.length ? true : false
         return (
             <Swipeout
-            style={{backgroundColor:custom.minorBgColor}}
+                style={{ backgroundColor: custom.minorBgColor }}
                 autoClose={true}
                 onClose={(secID, rowID, directione) => {
 

@@ -239,7 +239,7 @@ export default class AddCard extends Component {
 
     }
 
-    onSaveHandle() {
+    async onSaveHandle() {
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Type !")
             return
@@ -250,33 +250,54 @@ export default class AddCard extends Component {
         if (this.state.amount == "") {
             this.setState({ amount: 0 })
         }
-        dataStore.allCard.map(item => {
-            if (item.cardBrand == this.state.selectedCardBrand && item.cardType == this.state.selectedCardType) {
-                if (this.state.selectedRecordType == "Income") {
-                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
-                } else if (this.state.selectedRecordType == "Expenses") {
-                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
-                }
-            }
-        })
+        this.setState({ isLoadFinish: false })
+
         let data = {
-            date: moment(this.state.date).format('D MMMM YYYY'),
+            date: moment(this.state.date).format('DD MMMM YYYY'),
             cardBrand: this.state.selectedCardBrand,
             cardType: this.state.selectedCardType,
             amount: this.state.amount,
             remarks: this.state.remarks,
             recordType: this.state.selectedRecordType
         }
+
         dataStore.allRecord.push(data)
-        FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
-            if (res) {
-                FireBaseAPI.firebaseAddRecord(dataStore.allRecord, ((res2) => {
-                    if (res2) {
-                        this.props.props.navigation.navigate("Home")
-                    } else {
-                        ShowToast.showShortCenter("Add Record Failed !")
-                    }
-                }))
+
+
+        FireBaseAPI.firebaseAddRecord(dataStore.allRecord, ((res2) => {
+            if (res2) {
+                setTimeout(() => {
+                    dataStore.allCard.map(item => {
+                        if (item.cardBrand == this.state.selectedCardBrand && item.cardType == this.state.selectedCardType) {
+                            if (item.cardType == "Credit Card") {
+                                if (this.state.selectedRecordType == "Income") {
+                                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
+                                } else if (this.state.selectedRecordType == "Expenses") {
+                                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
+                                }
+                            } else {
+                                if (this.state.selectedRecordType == "Income") {
+                                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
+                                } else if (this.state.selectedRecordType == "Expenses") {
+                                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
+                                }
+                            }
+                        }
+                    })
+                    FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
+                        if (res) {
+                            this.setState({ isLoadFinish: true })
+                            this.props.props.navigation.navigate("Home")
+                        } else {
+                            ShowToast.showShortCenter("Add Record Failed !")
+                            this.props.props.navigation.navigate("Home")
+                        }
+
+                    }))
+                }, 300);
+            } else {
+                ShowToast.showShortCenter("Add Record Failed !")
+                this.props.props.navigation.navigate("Home")
             }
         }))
     }
