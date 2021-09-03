@@ -269,17 +269,19 @@ export default class AddCard extends Component {
                 setTimeout(() => {
                     dataStore.allCard.map(item => {
                         if (item.cardBrand == this.state.selectedCardBrand && item.cardType == this.state.selectedCardType) {
+                            let itemAmount = isNaN(parseFloat(item.currentAmount)) ? 0 : parseFloat(item.currentAmount);
+                            let stateAmount = parseFloat(this.state.amount)
                             if (item.cardType == "Credit Card") {
                                 if (this.state.selectedRecordType == "Income") {
-                                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
+                                    item.currentAmount = itemAmount - stateAmount
                                 } else if (this.state.selectedRecordType == "Expenses") {
-                                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
+                                    item.currentAmount = itemAmount + stateAmount
                                 }
                             } else {
                                 if (this.state.selectedRecordType == "Income") {
-                                    item.currentAmount = parseFloat(item.currentAmount) + parseFloat(this.state.amount)
+                                    item.currentAmount = itemAmount + stateAmount
                                 } else if (this.state.selectedRecordType == "Expenses") {
-                                    item.currentAmount = parseFloat(item.currentAmount) - parseFloat(this.state.amount)
+                                    item.currentAmount = itemAmount - stateAmount
                                 }
                             }
                         }
