@@ -19,7 +19,7 @@ export default function Home(props) {
     const RenderCard = () => {
         return !_.isEmpty(data) ? <Carousel
             data={data}
-            layout='stack'
+            layout='default'
             loop={false}
             renderItem={({ item, index }) => {
                 return <FlipCard
@@ -37,7 +37,7 @@ export default function Home(props) {
                             <Text style={{ fontSize: 30, fontWeight: "bold" }}>{item.cardBrand}</Text>
                         </View>
                         <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10 }}>
-                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Name : {item.cardBrand}</Text>
+                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Name : {item.cardName}</Text>
                         </View>
                         <TouchableOpacity style={{position: "absolute", bottom: 15, right : 20}} onPress={() => { navigator.navigate("All Record", item) }}>
                             <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>{"Details >>"}</Text>

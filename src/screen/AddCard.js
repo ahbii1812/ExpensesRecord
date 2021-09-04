@@ -81,7 +81,7 @@ export default class AddCard extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={styles.textTitleStyle}>Balance :</Text>
+                    <Text style={[styles.textTitleStyle, {width: this.state.selectedCardType == "Credit Card" ? "50%" : "35%" }]}>{this.state.selectedCardType == "Credit Card" ? "Out Standing Balance" : "Balance"} :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
                         <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
                         <TextInput
@@ -127,6 +127,20 @@ export default class AddCard extends Component {
             {this.state.isShowPicker && this.renderPicker()}
             {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
         </View>
+    }
+
+    verifyDuplicateCard(cardType) {
+        let tempCardList = cardType == "E-Wallet" ? this.state.walletList : this.state.cardList;
+        dataStore.allCard.map((item) => {
+            if(item.cardType == cardType) {
+                tempCardList.map((o, index) => {
+                    if(o.label == item.cardBrand || o.value == item.cardBrand) {
+                        tempCardList.splice(index, 1)
+                    }
+                })
+            }
+        })
+        return cardType == "E-Wallet" ? this.setState({walletList: tempCardList}) : this.setState({cardList: tempCardList})
     }
 
     handleCardNameClick() {
@@ -200,6 +214,7 @@ export default class AddCard extends Component {
     renderCardTypePicker() {
         const onConfirm = () => {
             this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
+            this.verifyDuplicateCard(this.state.tempSelectCardType);
         }
 
         return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>

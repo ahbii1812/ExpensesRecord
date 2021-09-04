@@ -1,11 +1,12 @@
 import React, { useState, useEffect, Component } from 'react'
-import { View, TouchableOpacity, Text, SectionList, ActivityIndicator } from 'react-native'
+import { View, TouchableOpacity, Text, SectionList, ActivityIndicator, Image } from 'react-native'
 import Swipeout from 'react-native-swipeout';
 import ShowToast from '../component/toast';
 import TopNavBar from '../component/topNavBar';
 import dataStore from '../storageHelper/dataStore';
 import FireBaseAPI from '../storageHelper/firebaseAPI';
 import custom from '../theme/customization';
+import _ from 'lodash'
 
 export default class AllRecord extends Component {
 
@@ -117,7 +118,7 @@ export default class AllRecord extends Component {
                                     props.section.data.splice(props.index, 1);
                                     this.updateList(res => {
                                         if (res) {
-            
+
                                         } else {
                                             ShowToast.showShortCenter("Update Failed ! Please try again ...")
                                         }
@@ -127,7 +128,7 @@ export default class AllRecord extends Component {
                                 ShowToast.showShortCenter("Update Failed ! Please try again ...")
                             }
                         }))
-                       
+
                     },
                     text: 'Delete', type: 'delete'
                 }]}
@@ -197,7 +198,12 @@ export default class AllRecord extends Component {
             <TopNavBar title={"All Record"} backButton props={this.props.props.navigation} />
             {!this.state.isLoadFinish ? <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
-            </View> :
+            </View> : (_.isEmpty(this.state.listData) ?
+                <View style={{ height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
+                    <Image source={require('../icon/no_data_icon.png')} resizeMode={"stretch"} 
+                    style={{width: 350, height: 300, tintColor : "rgba(255,255,255,0.5)", marginTop: -350, marginLeft: -25}}></Image>
+                    <Text style={{marginTop: -30, fontSize: custom.navBarTitleFontSize, color: "rgba(255,255,255,0.5)", fontWeight: "bold"}}>No Record Found</Text>
+                </View> :
                 <SectionList
                     style={{ marginTop: 30 }}
                     sections={this.state.listData}
@@ -205,7 +211,9 @@ export default class AllRecord extends Component {
                     renderItem={item => this.renderList(item)}
                     renderSectionHeader={({ section: { title, data } }) => (data.length <= 0 ? null : this.renderTitle(title))}
                     stickySectionHeadersEnabled={false}
-                />}
+                />)
+
+            }
         </View>
     }
 
