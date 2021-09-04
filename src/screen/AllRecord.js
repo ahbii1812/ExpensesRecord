@@ -46,11 +46,12 @@ export default class AllRecord extends Component {
 
     }
 
-    updateList() {
+    updateList(callback) {
+
         this.setState({ isLoadFinish: false })
-        let tempArr = []
         this.setState({ update: !this.state.update })
 
+        let tempArr = []
         this.state.unUsedList.length > 0 && this.state.unUsedList.map((item) => {
             tempArr.push(item)
         })
@@ -60,12 +61,15 @@ export default class AllRecord extends Component {
             })
         })
         FireBaseAPI.updateRecord(tempArr, res => {
-            setTimeout(() => {
-                this.setState({ isLoadFinish: true })
-            }, 150);
+            if (res) {
+                callback && callback(true)
+                setTimeout(() => {
+                    this.setState({ isLoadFinish: true })
+                }, 150);
 
-            if (!res) {
+            } else {
                 ShowToast.showShortCenter("Update Failed ! Please try again ...")
+                callback && callback(false)
             }
         })
 
@@ -85,7 +89,46 @@ export default class AllRecord extends Component {
 
                 }}
                 right={[{
-                    onPress: (x) => { props.section.data.splice(props.index, 1); this.updateList(); },
+                    onPress: (x) => {
+                        //Reverd Card current Amount
+                        let tempData = props.section.data[props.index]
+                        dataStore.allCard.map((item) => {
+                            if (item.cardBrand == tempData.cardBrand && item.cardType == tempData.cardType) {
+                                let tempCurrAmt = parseFloat(item.currentAmount)
+                                let newAmt = parseFloat(tempData.amount)
+                                if (item.cardType == "Credit Card") {
+                                    if (tempData.recordType == "Income") {
+                                        item.currentAmount = tempCurrAmt + newAmt
+                                    } else {
+                                        item.currentAmount = tempCurrAmt - newAmt
+                                    }
+                                } else {
+                                    if (tempData.recordType == "Income") {
+                                        item.currentAmount = tempCurrAmt - newAmt
+                                    } else {
+                                        item.currentAmount = tempCurrAmt + newAmt
+                                    }
+                                }
+                            }
+                        });
+                        FireBaseAPI.firebaseAddCard(dataStore.allCard, ((res) => {
+                            if (res) {
+                                setTimeout(() => {
+                                    props.section.data.splice(props.index, 1);
+                                    this.updateList(res => {
+                                        if (res) {
+            
+                                        } else {
+                                            ShowToast.showShortCenter("Update Failed ! Please try again ...")
+                                        }
+                                    });
+                                }, 150);
+                            } else {
+                                ShowToast.showShortCenter("Update Failed ! Please try again ...")
+                            }
+                        }))
+                       
+                    },
                     text: 'Delete', type: 'delete'
                 }]}
                 rowID={props.index}
