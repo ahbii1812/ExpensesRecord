@@ -46,9 +46,12 @@ class firebaseAPI extends Component {
 
     }
 
-    firebaseGetOwnData = async () => {
+    firebaseGetOwnData = async (callback) => {
         const OwnData = await firestore().collection('users').doc(dataStore.deviceID).get();
-        console.log('Firebase === OwnData.data => ', OwnData.data());
+        dataStore.allCard = OwnData.data()?.data ? OwnData.data().data : [];
+        dataStore.allRecord = OwnData.data()?.record ? OwnData.data().record : [];
+        console.log(' WJ Firebase === OwnData.data => ', OwnData.data());
+        callback && callback(true)
     }
 
     async firebaseAddCard(data, callback) {
