@@ -1,6 +1,6 @@
-import { Picker } from "@react-native-picker/picker";
+import Picker from "react-native-picker-select";
 import React, { Component } from "react";
-import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, Platform } from 'react-native';
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform } from 'react-native';
 import ShowToast from "../component/toast";
 import TopNavBar from '../component/topNavBar';
 import dataStore from "../storageHelper/dataStore";
@@ -40,24 +40,21 @@ export default class AddCard extends Component {
                 { label: "Others", value: "Others" },
             ],
             selectedCardBrand: "",
-            tempSelectedCard: "",
             isShowPicker: false,
             cardTypeList: [
                 { label: "Credit Card", value: "Credit Card" },
-                { label: "Debit Card / Saving Account", value: "Debit Card / Saving Account" },
+                { label: "Debit Card", value: "Debit Card" },
                 { label: "E-Wallet", value: "E-Wallet" }],
-            tempSelectCardType: "",
             selectedCardType: "",
             isShowCardTypePicker: false,
-            amount: "",
-            creditLimit: "",
+            amount: 0,
+            creditLimit: 0,
             cardName: ""
         }
 
     }
 
     componentDidMount() {
-        this.setState({ tempSelectCardType: this.state.cardTypeList[0].value })
     }
 
     render() {
@@ -66,29 +63,26 @@ export default class AddCard extends Component {
             <View style={{ width: "100%", marginTop: 35, backgroundColor: custom.minorBgColor }}>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Type :</Text>
-                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowCardTypePicker: true }); Keyboard.dismiss() }} >
-                        {this.state.selectedCardType ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardType}</Text>
-                            :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Card Type...</Text>}
-                    </TouchableOpacity>
+                    <View style={{ width: "60%", height: "100%", justifyContent: "center" }}>
+                        {this.renderCardTypePicker()}
+                    </View>
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Card Brand :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
-                        {this.state.selectedCardBrand ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardBrand}</Text>
-                            :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Brand...</Text>}
+                        {this.state.selectedCardType == "" ? <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>{"Select a brand..."}</Text>
+                            : this.renderPicker()}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
-                    <Text style={[styles.textTitleStyle, {width: this.state.selectedCardType == "Credit Card" ? "50%" : "35%" }]}>{this.state.selectedCardType == "Credit Card" ? "Out Standing Balance" : "Balance"} :</Text>
+                    <Text style={[styles.textTitleStyle, { width: this.state.selectedCardType == "Credit Card" ? "50%" : "35%" }]}>{this.state.selectedCardType == "Credit Card" ? "Out Standing Balance" : "Balance"} :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
-                        <Text style={[styles.textInputStyle, { width: "15%",  paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
+                        <Text style={[styles.textInputStyle, { width: "15%", paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
                         <TextInput
                             maxLength={10}
                             keyboardType="numeric"
                             onChangeText={(text) => { this.onChangeAmount(text) }}
-                            style={[styles.textInputStyle, { width: "85%" }]}
+                            style={[styles.textInputStyle, { width: "85%", padding: 0}]}
                             placeholder={"0.00"}
                             value={this.state.amount}
                             placeholderTextColor={custom.placeholderTextColor}
@@ -98,12 +92,12 @@ export default class AddCard extends Component {
                 {this.state.selectedCardType == "Credit Card" && <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Credit Limit :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
-                        <Text style={[styles.textInputStyle, { width: "15%",  paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
+                        <Text style={[styles.textInputStyle, { width: "15%", paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
                         <TextInput
                             maxLength={10}
                             keyboardType="numeric"
                             onChangeText={(text) => { this.onChangeCreditLimit(text) }}
-                            style={[styles.textInputStyle, { width: "85%" }]}
+                            style={[styles.textInputStyle, { width: "85%", padding: 0 }]}
                             placeholder={"0.00"}
                             value={this.state.creditLimit}
                             placeholderTextColor={custom.placeholderTextColor}
@@ -112,49 +106,42 @@ export default class AddCard extends Component {
                 </View>}
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Card Name :</Text>
-                    <TextInput 
-                    placeholder={"Default (Card Brand)"} 
-                    placeholderTextColor={custom.placeholderTextColor} 
-                    style={styles.textInputStyle}
-                    value={this.state.cardName}
-                    onChangeText={(text) => { this.setState({cardName : text}) }}></TextInput>
+                    <TextInput
+                        placeholder={"Default (Card Brand)"}
+                        placeholderTextColor={custom.placeholderTextColor}
+                        style={[styles.textInputStyle, , {padding: 0}]}
+                        value={this.state.cardName}
+                        onChangeText={(text) => { this.setState({ cardName: text }) }}></TextInput>
                 </View>
                 <View style={[styles.textRowItemStyle, { height: 15, borderBottomWidth: 0 }]} />
             </View>
             <TouchableOpacity onPress={() => this.onSaveHandle()} style={styles.addButtonStyle} >
                 <Text style={{ color: custom.mainFontColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>Add</Text>
             </TouchableOpacity>
-            {this.state.isShowPicker && this.renderPicker()}
-            {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
         </View>
     }
 
     verifyDuplicateCard(cardType) {
         let tempCardList = cardType == "E-Wallet" ? this.state.walletList : this.state.cardList;
         dataStore.allCard.map((item) => {
-            if(item.cardType == cardType) {
+            if (item.cardType == cardType) {
                 tempCardList.map((o, index) => {
-                    if(o.label == item.cardBrand || o.value == item.cardBrand) {
+                    if (o.label == item.cardBrand || o.value == item.cardBrand) {
                         tempCardList.splice(index, 1)
                     }
                 })
             }
         })
-        return cardType == "E-Wallet" ? this.setState({walletList: tempCardList}) : this.setState({cardList: tempCardList})
+        return cardType == "E-Wallet" ? this.setState({ walletList: tempCardList }) : this.setState({ cardList: tempCardList })
     }
 
     handleCardNameClick() {
-        if (this.state.selectedCardType == "E-Wallet") {
-            this.setState({ tempSelectedCard: this.state.walletList[0].value })
-        } else {
-            this.setState({ tempSelectedCard: this.state.cardList[0].value })
-        }
-
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Card Type...")
             Keyboard.dismiss()
             return
         }
+
         this.setState({ isShowPicker: true });
         Keyboard.dismiss()
     }
@@ -180,84 +167,84 @@ export default class AddCard extends Component {
     }
 
     renderPicker() {
-        const onConfirm = () => {
-            this.setState({ selectedCardBrand: this.state.tempSelectedCard, isShowPicker: false })
-        }
+        return <Picker
+            selectedValue={this.state.selectedCardBrand}
+            onValueChange={(itemValue, itemIndex) => {
+                this.setState({ selectedCardBrand: itemValue })
+            }}
+            useNativeAndroidPickerStyle={false}
+            style={{
+                inputAndroid: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize,
+                    padding: 0
+                },
+                inputIOS: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize
+                },
+            }}
+            placeholder={{
+                label: 'Select a brand...',
+                value: null,
+                color: custom.placeholderTextColor,
+            }}
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
-            <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
-                <View style={{ width: "100%", height: "70%" }} />
-            </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: "#696969", flexDirection: "row" }}>
-                <TouchableOpacity onPress={() => { this.setState({ isShowPicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
-                </TouchableOpacity>
-            </View>
-            <Picker
-                style={{ backgroundColor: "#808080", height: "30%" }}
-                selectedValue={this.state.tempSelectedCard}
-            onValueChange={(itemValue, itemIndex) =>{
-                this.setState({ tempSelectedCard: itemValue })}}
-                itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
-            >
-                {this.state.selectedCardType == "E-Wallet" ? this.state.walletList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />) : this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
-            </Picker>
-        </View >
+            itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
+            items={this.state.selectedCardType == "E-Wallet" ? this.state.walletList : this.state.cardList}
+        >
+            {/* {this.state.selectedCardType == "E-Wallet" ? this.state.walletList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />) : this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)} */}
+        </Picker>
     }
 
     renderCardTypePicker() {
-        const onConfirm = () => {
-            this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
-            this.verifyDuplicateCard(this.state.tempSelectCardType);
-        }
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
-            <TouchableWithoutFeedback onPress={() => { this.setState({ isShowCardTypePicker: false }) }}>
-                <View style={{ width: "100%", height: "70%" }} />
-            </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: "#696969", flexDirection: "row" }}>
-                <TouchableOpacity onPress={() => { this.setState({ isShowCardTypePicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
-                </TouchableOpacity>
-            </View>
-            <Picker
-                style={{ backgroundColor: "#808080", height: "30%" }}
-                selectedValue={this.state.tempSelectCardType}
-                onValueChange={(itemValue, itemIndex) =>{
-                    this.setState({ tempSelectedCard : "", selectedCardBrand: ""})
-                    this.setState({ tempSelectCardType: itemValue })}}
-                itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
-            >
-                {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
-            </Picker>
-        </View >
+        return <Picker
+            selectedValue={this.state.selectedCardType}
+            onValueChange={(itemValue, itemIndex) => {
+                this.setState({ selectedCardBrand: "" })
+                this.setState({ selectedCardType: itemValue })
+            }}
+            useNativeAndroidPickerStyle={false}
+            style={{
+                inputAndroid: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize,
+                    padding: 0
+                },
+                inputIOS: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize
+                },
+            }}
+            placeholder={{
+                label: 'Select a Type...',
+                value: null,
+                color: custom.placeholderTextColor,
+            }}
+
+            itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
+            items={this.state.cardTypeList}
+        />
     }
 
     onSaveHandle() {
+        console.log("WJ this.state.selectedCardBrand",this.state.selectedCardBrand)
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Card Type !")
             return
         } else if (this.state.selectedCardBrand == "") {
-            ShowToast.showShortCenter("Please Select Bank/E-Wallet Name !")
+            ShowToast.showShortCenter("Please Select Bank/E-Wallet Brand !")
+            return
+        } else if (this.state.selectedCardBrand == null) {
+            ShowToast.showShortCenter("Brand not valid ! Please choose again...")
             return
         }
         if (this.state.amount == "") {
-            this.setState({ amount: parseInt(0.00) })
+            this.setState({ amount: 0 })
         }
         if (this.state.creditLimit == "") {
-            this.setState({ creditLimit: parseInt(0.00) })
+            this.setState({ creditLimit: 0 })
         }
         let data = {
             cardBrand: this.state.selectedCardBrand,

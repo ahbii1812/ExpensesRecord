@@ -1,4 +1,4 @@
-import { Picker } from "@react-native-picker/picker";
+import Picker from "react-native-picker-select";
 import React, { Component } from "react";
 import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, ActivityIndicator, Platform } from 'react-native';
 import ShowToast from "../component/toast";
@@ -17,13 +17,11 @@ export default class AddCard extends Component {
         this.state = {
             cardList: [],
             selectedCardBrand: "",
-            tempSelectedCardBrand: "",
             isShowPicker: false,
             cardTypeList: [
                 { label: "Credit Card", value: "Credit Card" },
-                { label: "Debit Card / Saving Account", value: "Debit Card / Saving Account" },
+                { label: "Debit Card", value: "Debit Card" },
                 { label: "E-Wallet", value: "E-Wallet" }],
-            tempSelectCardType: "",
             selectedCardType: "",
             isShowCardTypePicker: false,
             amount: "",
@@ -47,7 +45,6 @@ export default class AddCard extends Component {
         }, {}))
 
         this.setState({ categorizedCard: categorizedCard });
-        this.setState({ tempSelectCardType: this.state.cardTypeList[0].value })
     }
 
     render() {
@@ -71,17 +68,14 @@ export default class AddCard extends Component {
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Type :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.setState({ isShowCardTypePicker: true }); Keyboard.dismiss() }} >
-                        {this.state.selectedCardType ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardType}</Text>
-                            :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Card Type...</Text>}
+                        {this.renderCardTypePicker()}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Bank Brand :</Text>
                     <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
-                        {this.state.selectedCardBrand ? <Text style={{ color: custom.mainFontColor, fontSize: custom.titleFontSize }}>{this.state.selectedCardBrand}</Text>
-                            :
-                            <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>Please Select Brand...</Text>}
+                    {this.state.selectedCardType == "" ? <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>{"Select a brand..."}</Text>
+                            : this.renderPicker()}
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textRowItemStyle}>
@@ -112,8 +106,6 @@ export default class AddCard extends Component {
             <TouchableOpacity onPress={() => this.onSaveHandle()} style={styles.addButtonStyle} >
                 <Text style={{ color: this.state.selectedRecordType == "Income" ? custom.incomeColor : custom.expensesColor, fontSize: custom.navBarTitleFontSize, fontWeight: "bold" }}>{"Add " + this.state.selectedRecordType}</Text>
             </TouchableOpacity>
-            {this.state.isShowPicker && this.renderPicker()}
-            {this.state.isShowCardTypePicker && this.renderCardTypePicker()}
             <DatePickerModal ref={component => { this._datepicker = component }} onChangeDate={this.updateLatestDate} currDate={this.state.date} />
             {
                 !this.state.isLoadFinish && <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
@@ -148,93 +140,87 @@ export default class AddCard extends Component {
     }
 
     renderPicker() {
-        const onConfirm = () => {
-            this.setState({ selectedCardBrand: this.state.tempSelectedCardBrand, isShowPicker: false })
-        }
+        return <Picker
+            selectedValue={this.state.selectedCardBrand}
+            onValueChange={(itemValue, itemIndex) => {
+                this.setState({ selectedCardBrand: itemValue })
+            }}
+            useNativeAndroidPickerStyle={false}
+            style={{
+                inputAndroid: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize,
+                    padding: 0
+                },
+                inputIOS: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize
+                },
+            }}
+            placeholder={{
+                label: 'Select a brand...',
+                value: null,
+                color: custom.placeholderTextColor,
+            }}
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
-            <TouchableWithoutFeedback onPress={() => { this.setState({ isShowPicker: false }) }}>
-                <View style={{ width: "100%", height: "70%" }} />
-            </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: custom.pickerColor, flexDirection: "row" }}>
-                <TouchableOpacity onPress={() => { this.setState({ isShowPicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
-                </TouchableOpacity>
-            </View>
-            <Picker
-                style={{ backgroundColor: custom.pickerColor, height: "30%" }}
-                selectedValue={this.state.tempSelectedCardBrand}
-                onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ tempSelectedCardBrand: itemValue })}
-                itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
-            >
-                {this.state.cardList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
-            </Picker>
-        </View >
+            itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
+            items={this.state.cardList}
+        >
+        </Picker>
     }
 
     renderCardTypePicker() {
-        const onConfirm = () => {
-            this.setState({ selectedCardType: this.state.tempSelectCardType, isShowCardTypePicker: false })
-            this.updateCardList();
-        }
 
-        return <View style={{ height: "100%", width: "100%", position: "absolute", justifyContent: "flex-end" }}>
-            <TouchableWithoutFeedback onPress={() => { this.setState({ isShowCardTypePicker: false }) }}>
-                <View style={{ width: "100%", height: "70%" }} />
-            </TouchableWithoutFeedback>
-            <View style={{ height: 44, width: "100%", backgroundColor: custom.pickerColor, flexDirection: "row" }}>
-                <TouchableOpacity onPress={() => { this.setState({ isShowCardTypePicker: false }) }} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity disabled style={{ width: "60%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Select Account</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => onConfirm()} style={{ width: "20%", alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ fontSize: custom.titleFontSize, color: custom.mainFontColor, fontWeight: "bold" }}>Confirm</Text>
-                </TouchableOpacity>
-            </View>
-            <Picker
-                style={{ backgroundColor: custom.pickerColor, height: "30%" }}
-                selectedValue={this.state.tempSelectCardType}
-                onValueChange={(itemValue, itemIndex) => {
-                    this.setState({ tempSelectCardType: itemValue, selectedCardBrand: "", tempSelectedCardBrand: "" })
-                }}
-                itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
-            >
-                {this.state.cardTypeList.map((item, i) => <Picker.Item key={i} label={item.label} value={item.value} />)}
-            </Picker>
-        </View >
+        return <Picker
+            selectedValue={this.state.selectedCardType}
+            onValueChange={(itemValue, itemIndex) => {
+                this.setState({ selectedCardBrand: itemValue })
+                this.setState({ selectedCardType: itemValue })
+                this.updateCardList(itemValue);
+            }}
+            useNativeAndroidPickerStyle={false}
+            style={{
+                inputAndroid: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize,
+                    padding: 0
+                },
+                inputIOS: {
+                    color: custom.mainFontColor,
+                    fontSize: custom.titleFontSize
+                },
+            }}
+            placeholder={{
+                label: 'Select a Type...',
+                value: null,
+                color: custom.placeholderTextColor,
+            }}
+
+            itemStyle={{ fontWeight: "bold", color: custom.mainFontColor }}
+            items={this.state.cardTypeList}
+        />
     }
 
-    updateCardList() {
+    async updateCardList(itemValue) {
         this.setState({ isLoadFinish: false })
         let tempCard = []
         let tempCardList = []
         let pushPickerList = []
         this.state.categorizedCard.map((item) => {
-            if (item.cardType == this.state.tempSelectCardType) {
+            if (item.cardType == itemValue) {
                 tempCard = item.availableCard;
             }
         })
 
-        tempCard.map((item) => {
+        await tempCard.map((item) => {
             if (!tempCardList.includes(item.cardBrand)) {
                 tempCardList.push(item.cardBrand)
                 pushPickerList.push({ value: item.cardBrand, label: item.cardBrand })
             }
         })
-
-
         this.setState({ cardList: pushPickerList })
         setTimeout(() => {
-            this.setState({ isLoadFinish: true, tempSelectedCardBrand: pushPickerList[0]?.value })
+            this.setState({ isLoadFinish: true})
         }, 300);
 
     }
@@ -245,6 +231,9 @@ export default class AddCard extends Component {
             return
         } else if (this.state.selectedCardBrand == "") {
             ShowToast.showShortCenter("Please Select Brand !")
+            return
+        } else if (this.state.selectedCardBrand == null) {
+            ShowToast.showShortCenter("Brand not valid ! Please choose again...")
             return
         }
         if (this.state.amount == "") {

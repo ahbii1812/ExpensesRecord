@@ -37,6 +37,9 @@ class firebaseAPI extends Component {
         const observer = AllUsers.onSnapshot(docSnapshot => {
             dataStore.allCard = docSnapshot.data()?.data ? docSnapshot.data().data : [];
             dataStore.allRecord = docSnapshot.data()?.record ? docSnapshot.data().record : [];
+            if (docSnapshot.data() == undefined) {
+                this.updateRecord(dataStore.allCard)
+            }
             console.log('Firebase === Own Real Time Data => ', docSnapshot.data());
             callback && callback(true)
         }, err => {
