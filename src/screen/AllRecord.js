@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from 'react'
-import { View, TouchableOpacity, Text, SectionList, ActivityIndicator, Image } from 'react-native'
+import { View, Alert, Text, SectionList, ActivityIndicator, Image } from 'react-native'
 import Swipeout from 'react-native-swipeout';
 import ShowToast from '../component/toast';
 import TopNavBar from '../component/topNavBar';
@@ -63,11 +63,10 @@ export default class AllRecord extends Component {
         })
         FireBaseAPI.updateRecord(tempArr, res => {
             if (res) {
-                callback && callback(true)
                 setTimeout(() => {
                     this.setState({ isLoadFinish: true })
                 }, 150);
-
+                callback && callback(true)
             } else {
                 ShowToast.showShortCenter("Update Failed ! Please try again ...")
                 callback && callback(false)
@@ -194,15 +193,62 @@ export default class AllRecord extends Component {
     }
 
     render() {
+        const deleteCard = () => {
+            Alert.alert(
+                "Delete Confirmation",
+                "Confirm Delete " + (this.props.props.route.params?.cardName ? this.props.props.route.params.cardName : this.props.props.route.params.cardBrand) + " ?",
+                [
+                    {
+                        text: "No",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel"
+                    },
+                    { text: "Yes", onPress: () => updateDeleteCard() }
+                ]
+            );
+        }
+
+        const updateDeleteCard = async() => {
+            this.setState({ isLoadFinish: false })
+            let currCardData = this.props.props.route.params;
+            await dataStore.allCard.map((item, index) => {
+                if (item.cardBrand == currCardData.cardBrand && item.cardType == currCardData.cardType) {
+                    dataStore.allCard.splice(index, 1)
+                }
+            })
+            FireBaseAPI.firebaseAddCard(dataStore.allCard, res => {
+                if (res) {
+                    setTimeout(() => {
+                        console.log("WJ allcard1", dataStore.allCard)
+                        FireBaseAPI.updateRecord(this.state.unUsedList, res => {
+                            if (res) {
+                                this.setState({ isLoadFinish: true })
+                                this.props.props.navigation.navigate("Home")
+                            } else {
+                                this.setState({ isLoadFinish: true })
+                                ShowToast.showShortCenter("Delete Failed ! Please try again ...")
+                                return
+                            }
+                        })
+                    }, 150);
+
+                } else {
+                    this.setState({ isLoadFinish: true })
+                    ShowToast.showShortCenter("Delete Failed ! Please try again ...")
+                    return
+                }
+            })
+        }
+
         return <View style={{ height: "100%", width: "100%", backgroundColor: custom.mainBgColor }}>
-            <TopNavBar title={"All Record"} backButton props={this.props.props.navigation} />
+            <TopNavBar title={this.props.props.route.params?.cardName ? this.props.props.route.params.cardName : this.props.props.route.params?.cardBrand ? this.props.props.route.params.cardBrand : "All Record"} backButton props={this.props.props.navigation} rightButton={this.props.props.route.params?.cardBrand ? true : false} onRightPress={deleteCard} />
             {!this.state.isLoadFinish ? <View style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)", alignItems: "center", justifyContent: "center" }}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
             </View> : (_.isEmpty(this.state.listData) ?
-                <View style={{ height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-                    <Image source={require('../icon/no_data_icon.png')} resizeMode={"stretch"} 
-                    style={{width: 350, height: 300, tintColor : "rgba(255,255,255,0.5)", marginTop: -350, marginLeft: -25}}></Image>
-                    <Text style={{marginTop: -30, fontSize: custom.navBarTitleFontSize, color: "rgba(255,255,255,0.5)", fontWeight: "bold"}}>No Record Found</Text>
+                <View style={{ height: "100%", width: "100%", justifyContent: "center", alignItems: "center" }}>
+                    <Image source={require('../icon/no_data_icon.png')} resizeMode={"stretch"}
+                        style={{ width: 350, height: 300, tintColor: "rgba(255,255,255,0.5)", marginTop: -350, marginLeft: -25 }}></Image>
+                    <Text style={{ marginTop: -30, fontSize: custom.navBarTitleFontSize, color: "rgba(255,255,255,0.5)", fontWeight: "bold" }}>No Record Found</Text>
                 </View> :
                 <SectionList
                     style={{ marginTop: 30 }}
