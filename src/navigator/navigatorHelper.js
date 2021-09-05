@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import { NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
@@ -18,10 +18,12 @@ import custom from '../theme/customization';
 import SplashScreen from '../screen/Splash'
 import AddRecord from '../screen/AddRecord'
 import AllRecord from '../screen/AllRecord'
+import Information from '../screen/Information';
 
 function HomePage({ navigation }) {
     return (
         <Stack.Navigator initialRouteName="Splash"
+        sceneAnimationEnabled={false}
             screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" >
                 {props => <SplashScreen props={props} />}
@@ -38,6 +40,9 @@ function HomePage({ navigation }) {
             <Stack.Screen name="All Record" >
                 {props => <AllRecord props={props} />}
             </Stack.Screen>
+            <Stack.Screen name="Information" >
+                {props => <Information props={props} />}
+            </Stack.Screen>
         </Stack.Navigator>)
 
 }
@@ -46,12 +51,13 @@ const Stack = createStackNavigator();
 
 function App({ navigation }) {
     return (
-        <NavigationContainer style={{ backgroundColor: custom.mainBgColor }}>
+        <NavigationContainer style={{ backgroundColor: custom.mainBgColor }} theme={{ colors: { background: custom.mainBgColor } }}>
             <StatusBar translucent backgroundColor="transparent"></StatusBar>
             <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 0 }} />
-            {/* <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 1 }}>
-            </SafeAreaView> */}
-            <HomePage />
+            <SafeAreaView style={{ backgroundColor: custom.mainBgColor, flex: 1 }}>
+                <HomePage />
+            </SafeAreaView>
+
         </NavigationContainer>
     );
 }

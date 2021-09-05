@@ -173,7 +173,7 @@ export default class AllRecord extends Component {
                             paddingRight: 7,
                             textAlign: "right",
                             width: "28%",
-                            color: custom.mainFontColor,
+                            color: item.recordType == "Expenses" ? custom.expensesColor : custom.incomeColor,
                             fontSize: custom.titleFontSize
                         }}
                     >
@@ -219,7 +219,6 @@ export default class AllRecord extends Component {
             FireBaseAPI.firebaseAddCard(dataStore.allCard, res => {
                 if (res) {
                     setTimeout(() => {
-                        console.log("WJ allcard1", dataStore.allCard)
                         FireBaseAPI.updateRecord(this.state.unUsedList, res => {
                             if (res) {
                                 this.setState({ isLoadFinish: true })

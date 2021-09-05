@@ -40,6 +40,8 @@ class DatePickerModal extends Component {
                 date={this.state.date}
                 onDateChange={item => { this.setState({ date: item }) }}
                 maximumDate={new Date()}
+                themeVariant="dark"
+                fadeToColor="none"
             />
         </Modal>
     }

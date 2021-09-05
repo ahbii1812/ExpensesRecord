@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { Component } from "react";
-import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, Platform } from 'react-native';
 import ShowToast from "../component/toast";
 import TopNavBar from '../component/topNavBar';
 import dataStore from "../storageHelper/dataStore";
@@ -83,7 +83,7 @@ export default class AddCard extends Component {
                 <View style={styles.textRowItemStyle}>
                     <Text style={[styles.textTitleStyle, {width: this.state.selectedCardType == "Credit Card" ? "50%" : "35%" }]}>{this.state.selectedCardType == "Credit Card" ? "Out Standing Balance" : "Balance"} :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
-                        <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
+                        <Text style={[styles.textInputStyle, { width: "15%",  paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
                         <TextInput
                             maxLength={10}
                             keyboardType="numeric"
@@ -98,7 +98,7 @@ export default class AddCard extends Component {
                 {this.state.selectedCardType == "Credit Card" && <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Credit Limit :</Text>
                     <View style={{ width: "60%", flexDirection: "row" }}>
-                        <Text style={[styles.textInputStyle, { width: "15%" }]}>RM</Text>
+                        <Text style={[styles.textInputStyle, { width: "15%",  paddingTop: Platform.OS == "ios" ? 0 : 2 }]}>RM</Text>
                         <TextInput
                             maxLength={10}
                             keyboardType="numeric"

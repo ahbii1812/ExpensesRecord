@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import BottomDrawer from 'react-native-bottom-drawer-view';
 import custom from '../theme/customization';
 
-const TAB_BAR_HEIGHT = 30;
+const TAB_BAR_HEIGHT = Platform.OS == "ios" ? 52 : -20;
 
 export default class BottomHalfModal extends Component {
 
@@ -31,10 +31,10 @@ export default class BottomHalfModal extends Component {
                             <Text style={styles.buttonTextStyle}>Add Record</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonContainerStyle}>
+                    <TouchableOpacity onPress={()=> this.props.navigator.navigate("Information")} style={styles.buttonContainerStyle}>
                         <Image source={require('../icon/setting_icon.png')} resizeMode={"stretch"} style={styles.iconStyle}></Image>
                         <View style={styles.textContainer}>
-                            <Text style={styles.buttonTextStyle}>Setting</Text>
+                            <Text style={styles.buttonTextStyle}>Information</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
