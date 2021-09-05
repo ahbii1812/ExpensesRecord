@@ -229,7 +229,6 @@ export default class AddCard extends Component {
     }
 
     onSaveHandle() {
-        console.log("WJ this.state.selectedCardBrand",this.state.selectedCardBrand)
         if (this.state.selectedCardType == "") {
             ShowToast.showShortCenter("Please Select Card Type !")
             return
