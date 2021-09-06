@@ -73,7 +73,7 @@ export default class AddCard extends Component {
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Bank Brand :</Text>
-                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
+                    <TouchableOpacity disabled={this.state.selectedCardType == "" ? false : true} style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
                     {this.state.selectedCardType == "" ? <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>{"Select a brand..."}</Text>
                             : this.renderPicker()}
                     </TouchableOpacity>

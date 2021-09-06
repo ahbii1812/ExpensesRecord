@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import _ from 'lodash';
-import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View, BackHandler,Alert } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import dataStore from '../storageHelper/dataStore';
 import custom from '../theme/customization';
@@ -11,6 +11,27 @@ import BottomHalfModal from '../component/bottomHalfModal';
 export default function Home(props) {
     const navigator = props.props.navigation
     const [data, setData] = useState([])
+
+    useEffect(() => {
+        const backAction = () => {
+          Alert.alert("Alert!", "Are you sure you want quit?", [
+            {
+              text: "Cancel",
+              onPress: () => null,
+              style: "cancel"
+            },
+            { text: "YES", onPress: () => BackHandler.exitApp() }
+          ]);
+          return true;
+        };
+    
+        const backHandler = BackHandler.addEventListener(
+          "hardwareBackPress",
+          backAction
+        );
+    
+        return () => backHandler.remove();
+      }, []);
 
     useFocusEffect(() => {
         setData(dataStore.allCard)
@@ -37,7 +58,7 @@ export default function Home(props) {
                             <Text style={{ fontSize: 30, fontWeight: "bold" }}>{item.cardBrand}</Text>
                         </View>
                         <View style={{ width: "95%", marginLeft: 14, justifyContent: "center", marginTop: 10 }}>
-                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Name : {item.cardName}</Text>
+                            <Text style={{ fontSize: custom.contentFontSize, fontWeight: "bold" }}>Card Name : {item.cardName == "" ? item.cardBrand : item.cardName}</Text>
                         </View>
                         <TouchableOpacity style={{position: "absolute", bottom: 15, right : 20}} onPress={() => { navigator.navigate("All Record", item) }}>
                             <Text style={{fontSize: custom.contentFontSize, fontWeight: "bold"}}>{"Details >>"}</Text>

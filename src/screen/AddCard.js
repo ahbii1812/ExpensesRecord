@@ -12,6 +12,7 @@ export default class AddCard extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            cardList: [],
             walletList: [
                 { label: "Aeon Wallet", value: "Aeon Wallet" },
                 { label: "Alipay", value: "Alipay" },
@@ -23,7 +24,23 @@ export default class AddCard extends Component {
                 { label: "Touch n Go", value: "Touch n Go" },
                 { label: "Others", value: "Others" }
             ],
-            cardList: [
+            FixedCardList: [
+                { label: "Affin Bank", value: "Affin Bank" },
+                { label: "Agro Bank", value: "Agro Bank" },
+                { label: "AmBank", value: "AmBank" },
+                { label: "CIMB Bank", value: "CIMB Bank" },
+                { label: "Exim Bank", value: "Exim Bank" },
+                { label: "HSBC Bank", value: "HSBC Bank" },
+                { label: "Hong Leong Bank", value: "Hong Leong Bank" },
+                { label: "Maybank", value: "Maybank" },
+                { label: "OCBC Bank", value: "OCBC Bank" },
+                { label: "Public Bank", value: "Public Bank" },
+                { label: "RHB Bank", value: "RHB Bank" },
+                { label: "Standard Chartered Bank", value: "Standard Chartered Bank" },
+                { label: "UOB Bank", value: "UOB Bank" },
+                { label: "Others", value: "Others" },
+            ],
+            FixedCreditCardList: [
                 { label: "Affin Bank", value: "Affin Bank" },
                 { label: "Agro Bank", value: "Agro Bank" },
                 { label: "AmBank", value: "AmBank" },
@@ -69,7 +86,7 @@ export default class AddCard extends Component {
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>Card Brand :</Text>
-                    <TouchableOpacity style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
+                    <TouchableOpacity disabled={this.state.selectedCardType == "" ? false : true} style={{ width: "60%", height: "100%", justifyContent: "center" }} onPress={() => { this.handleCardNameClick() }} >
                         {this.state.selectedCardType == "" ? <Text style={{ color: custom.placeholderTextColor, fontSize: custom.titleFontSize }}>{"Select a brand..."}</Text>
                             : this.renderPicker()}
                     </TouchableOpacity>
@@ -122,7 +139,7 @@ export default class AddCard extends Component {
     }
 
     verifyDuplicateCard(cardType) {
-        let tempCardList = cardType == "E-Wallet" ? this.state.walletList : this.state.cardList;
+        let tempCardList = cardType == "E-Wallet" ? this.state.walletList : cardType == "Credit Card" ? this.state.FixedCreditCardList : this.state.FixedCardList;
         dataStore.allCard.map((item) => {
             if (item.cardType == cardType) {
                 tempCardList.map((o, index) => {
@@ -204,6 +221,7 @@ export default class AddCard extends Component {
             onValueChange={(itemValue, itemIndex) => {
                 this.setState({ selectedCardBrand: "" })
                 this.setState({ selectedCardType: itemValue })
+                this.verifyDuplicateCard(itemValue)
             }}
             useNativeAndroidPickerStyle={false}
             style={{
