@@ -11,7 +11,7 @@ export default function Setting(props) {
             <View style={{ width: "100%", flexDirection: "column", backgroundColor: custom.minorBgColor, marginTop: 30 }}>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>{"Version :"}</Text>
-                    <Text style={styles.textContentStyle}>1.0.0</Text>
+                    <Text style={styles.textContentStyle}>2.0.0</Text>
                 </View>
                 <View style={styles.textRowItemStyle}>
                     <Text style={styles.textTitleStyle}>{"Unique ID :"}</Text>
